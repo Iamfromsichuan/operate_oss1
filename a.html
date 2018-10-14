@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <p id="p" ></p>
+    <button id="my" onclick="ohclick()">点我把</button>
+    <button id="my2" onclick="ononon()">点我把2222</button>
+</body>
+<script>
+    var odiv = document.getElementById("my");
+    var odiv2 = document.getElementById("my2");
+    var op= document.getElementById("p");
+    var b ;
+    var c;
+    var events={
+        __event:{},
+        emit(fncName,fncParams){
+            this.__event[fncName](fncParams)
+        },
+        listener(fncName,fncParams){
+            this.__event[fncName]=fncParams
+
+        },
+    }
+    function  a(b,c) {
+        b();
+    }
+    var promise1 = new Promise(function (r,j) {
+        console.log("创建了一个")
+        b=r;
+        c=j;
+        events.listener("waitMe",a(b,c))
+    })
+    function ohclick () {
+        promise1.then(function () {
+            op.innerHTML = "实现了";
+        })
+    }
+    function ononon() {
+        events.emit("waitMe",a(b,c)) ;
+    }
+</script>
+</html>

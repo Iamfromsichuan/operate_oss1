@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="https://116.114.18.150:9090/svn/front_end" uploadOnCheckin="8b11a664-279b-47c0-a207-2a9de0f8a687">
+    <serverData>
+      <paths name="https://116.114.18.150:9090/svn/front_end">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myUploadOnCheckinName" value="https://116.114.18.150:9090/svn/front_end" />
+  </component>
+</project>

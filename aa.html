@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div id="importExcel">
+
+</div>
+<input type="file">
+</body>
+<script>
+    var arr = []
+    var arr1 = []
+    function cont (n) {
+        for(var i = 1 ; i< n+1 ;i ++) {
+            /*
+            if(i%3==0 && i % 5 ==0){
+                arr.push("优秀")
+            }else if(i % 3 ==0) {
+                arr.push("san")
+            }else if(i % 5 == 0) {
+                arr.push("wu")
+            }else {
+                arr.push(i + "")
+            }
+            */
+            arr.push(i)
+        }
+        console.log(arr)
+    }
+    cont(15)
+    arr1 = arr.filter(function (i,number,input) {
+        if(i%3==0 && i % 5 ==0){
+            console.log(i)
+           return "优秀"
+        }else if(i % 3 ==0) {
+            return "san"
+        }else if(i % 5 == 0) {
+            return "wu"
+        }else {
+            return i + ""
+        }
+    })
+    console.log(arr1)
+</script>
+</html>
