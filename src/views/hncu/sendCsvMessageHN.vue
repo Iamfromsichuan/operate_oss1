@@ -29,6 +29,9 @@
 <script>
   import util from '@/libs/util';
   import {ERR_OK} from '@/config/config'
+  /*
+  * 测试
+  * */
   export default {
     data() {
       return {
