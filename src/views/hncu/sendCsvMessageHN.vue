@@ -71,7 +71,7 @@
                   phone: item.split(',')[0],
                   content: item.split(',')[1]
               });
-          })
+          });
           _that.pathName = document.getElementById('file').value;
           _that.canSend = false
         }
@@ -101,20 +101,20 @@
             if(res.data.status == ERR_OK) {
               var _index = _that.data.findIndex(obj => {
                 return item.phone === obj.phone
-              })
-              _that.data.splice(_index, 1)
-              _that.sendSuccess++
+              });
+              _that.data.splice(_index, 1);
+              _that.sendSuccess++;
               if(_that.sendSuccess + _that.sendFail === len) {
                 _that.sending = false
               }
             }else {
-              _that.$Message.error(res.msg)
+              _that.$Message.error(res.msg);
               _that.sendFail++
             }
           })
           .catch(function(err){
-            _that.sendFail++
-              console.log(index)
+            _that.sendFail++;
+              console.log(index);
             if(_that.sendSuccess + _that.sendFail === len) {
               _that.sending = false
             }

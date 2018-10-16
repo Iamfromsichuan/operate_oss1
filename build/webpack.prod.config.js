@@ -16,7 +16,7 @@ fs.open('./build/env.js', 'w', function(err, fd) {
 
 module.exports = merge(webpackBaseConfig, {
     output: {
-        publicPath: 'http://oss.operate.terabyte.com.cn/dist/',  // 修改 https://iv...admin 这部分为你的服务器域名
+        publicPath: 'http://oss.operate.terabyte.com.cn/dist/',  // 修改 https://iv...admin 这部分为你的服务器域名//http://oss.operate.terabyte.com.cn/oss_test/
         filename: '[name].[hash].js',
         chunkFilename: '[name].[hash].chunk.js'
     },
