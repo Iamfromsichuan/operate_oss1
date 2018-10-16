@@ -42,7 +42,7 @@
           {
             title: '短信内容',
             key: 'content'
-          }
+          },
         ],
         data: [],
         pathName: '',
@@ -56,40 +56,40 @@
         document.getElementById("file").click();
       },
       csv() {
-        this.data = []
-        this.pathName = ''
-        var _that = this
-        var file = document.getElementById("file").files[0];  
-        var reader = new FileReader();  
-        //将文件以文本形式读入页面  
+        this.data = [];
+        this.pathName = '';
+        var _that = this;
+        var file = document.getElementById("file").files[0];
+        var reader = new FileReader();
+        //将文件以文本形式读入页面
         reader.readAsText(file, 'gbk');
-        reader.onload=function(f){  
-          var _arr = [...this.result.split('\n')]
+        reader.onload=function(f){
+          var _arr = [...this.result.split('\n')];
           _arr.pop();
           _arr.map(item => {
-            _that.data.push({
-              phone: item.split(',')[0],
-              content: item.split(',')[1]
-            })
+              _that.data.push({
+                  phone: item.split(',')[0],
+                  content: item.split(',')[1]
+              });
           })
-          _that.pathName = document.getElementById('file').value
+          _that.pathName = document.getElementById('file').value;
           _that.canSend = false
         }
       },
       send() {
         if(!this.data.length) {
-          this.$Message.warning('暂无需要发送的短信！')
+          this.$Message.warning('暂无需要发送的短信！');
           return
         }
         this.modalConfirm = true
       },
       comfirmSend() {
         var _that = this;
-        this.modalConfirm = false
+        this.modalConfirm = false;
         this.sending = true;
         this.sendSuccess = 0;
         this.sendFail = 0;
-        const len = this.data.length
+        const len = this.data.length;
         this.data.map((item, index) => {
           util.ajax.get(util.baseUrl + '/hncu/sms/mt/sendCsv', {
             params: {
@@ -114,12 +114,16 @@
           })
           .catch(function(err){
             _that.sendFail++
+              console.log(index)
             if(_that.sendSuccess + _that.sendFail === len) {
               _that.sending = false
             }
             console.log(err);
           });
         })
+      },
+      add() {
+        this.arr.push({name:1})
       }
     }
   }
