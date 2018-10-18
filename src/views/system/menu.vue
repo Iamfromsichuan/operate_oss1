@@ -1,6 +1,6 @@
 <template>
   <div class="menu">
-    <Tree :data="data" :render="renderContent" show-checkbox multiple :load-data="loadData"></Tree ref="tree">
+    <Tree ref="tree" :data="data" :render="renderContent" show-checkbox multiple :load-data="loadData"></Tree >
 
     <Modal v-model="modalAdd" width="500" height='400'>
       <p slot="header" style="color:#f60;text-align:center">
@@ -42,7 +42,7 @@
       </div>
     </Modal>
   </div>
-  
+
 </template>
 
 <script>
@@ -142,9 +142,10 @@
         this.$Spin.show();
         util.ajax.get(util.baseUrl + '/system/menu/list')
         .then(function(res){
+          console.log(res)
           _that.$Spin.hide();
           if(res.data.status == ERR_OK) {
-            _that.trees = res.data.data
+            _that.trees = res.data.data;
             _that.initTrees()
           }else {
             _that.$Message.error(res.data.msg)
@@ -157,7 +158,7 @@
       initTrees () {
         var _index = this.trees.findIndex(item => {
           return item.parentId === -1
-        })
+        });
         this.newTree = Object.assign({}, this.trees[_index], {
           children: []
         })
@@ -169,7 +170,7 @@
           if(item.parentId === obj.id) {
             item = Object.assign({}, item, {
               children: []
-            })
+            });
             obj.children.push(item)
             this.appendTree(item)
           }
@@ -275,5 +276,5 @@
 </script>
 
 <style lang="less">
-  
+
 </style>

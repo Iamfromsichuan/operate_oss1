@@ -146,7 +146,9 @@ export const appRouter = [
         children: [
             { path: 'menu', title: '系统功能', icon: 'ios-cog', name: 'menu_index', access: 0, component: resolve => { require(['@/views/system/menu.vue'], resolve); } },
             { path: 'role', title: '角色管理', icon: 'person-stalker', name: 'role_index', access: 0, component: resolve => { require(['@/views/system/role.vue'], resolve); } },
-            { path: 'user', title: '用户管理', icon: 'person-add', name: 'user_index', access: 1, component: resolve => { require(['@/views/system/user.vue'], resolve); } }
+            { path: 'user', title: '用户管理', icon: 'person-add', name: 'user_index', access: 1, component: resolve => { require(['@/views/system/user.vue'], resolve); } },
+            { path: 'globalAttributes', title: '全局参数', icon: 'person-add', name: 'global_index', access: 0, component: resolve => { require(['@/views/system/globalAttributes.vue'], resolve); } },
+            { path: 'globalAttributes1', title: '全局参数', icon: 'person-add', name: 'global_index1', access: 0, component: resolve => { require(['@/views/system/globalAttributes1.vue'], resolve); } }
         ]
     },
     {

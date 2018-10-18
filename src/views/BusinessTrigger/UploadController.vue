@@ -1,5 +1,5 @@
 <template>
-    <div class="messageList">
+    <div class="messageList messageList_m">
         <Row>
             <Col span="3">
                 <Select @on-change="reduceIds" clearable v-model="filter.tableType" filterable placeholder="黑白名单类型">
@@ -308,8 +308,9 @@
                         _that.wscCode =''
                         _that.dataLoading = false
                         if(res.data.status == ERR_OK) {
-                            _that.datasLimen = res.data.data.list
-                            _that.TotalRecords = res.data.data.total
+                            _that.datasLimen = res.data.data.list;
+                            _that.totalRecords = res.data.data.total;//totalRecords//TotalRecords
+                            console.log(_that.totalRecords)
                         }else {
                             _that.$Message.error(res.data.msg)
                         }
@@ -320,22 +321,21 @@
             },
             searchListNmae(no) {
                 var _that = this;
-                this.filter.pageNo = no
-                _that.filter.pageSize = 100
-                this.dataLoading = true
-                this.orderNos = ''
-                this.checkedDatas = []
-                console.log(_that.filter.pageSize)
+                this.filter.pageNo = no;
+                _that.filter.pageSize = 100;
+                this.dataLoading = true;
+                this.orderNos = '';
+                this.checkedDatas = [];
                 util.ajax.get(util.baseUrl + '/black/white/config/list', {
                     params: this.filter
                 })
                     .then(function(res){
-                        _that.filter.pageSize = pageSize;
-                        _that.wscCode =''
-                        _that.dataLoading = false
+                        _that.filter.pageSize = 15;
+                        _that.wscCode ='';
+                        _that.dataLoading = false;
                         if(res.data.status == ERR_OK) {
-                            _that.datas = res.data.data.list
-                            _that.TotalRecords = res.data.data.total
+                            _that.datas = res.data.data.list;
+                            /*_that.TotalRecords = res.data.data.total*/
                             for(let i =0 ;i < _that.datas.length ;i++) {
                                 if(_that.datas[i].tableType == "白名单" ||_that.datas[i].tableType == "white" ) {
                                     _that.datasWhite.push(_that.datas[i])
@@ -376,6 +376,10 @@
     }
 </script>
 
-<style lang="less">
+<style>
 
+    .messageList_m .ivu-poptip-inner{
+        white-space: normal!important;
+        font-size: 14px;
+    }
 </style>

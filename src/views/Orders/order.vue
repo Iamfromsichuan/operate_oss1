@@ -148,7 +148,20 @@
                     },
                     {
                         title: '充值说明',
-                        key: 'orderContent'
+                        key: 'orderContent',
+                      render: (h, params) => {
+                        return h('Poptip', {
+                          props: {
+                            trigger: "hover",
+                            width: params.index===0&&params.row.orderContent.length>100?1000:400,
+                            content: params.row.orderContent ? params.row.orderContent : '点击添加'
+                          },
+                          style: {
+                            whiteSpace: 'normal',
+                            color:params.row.orderContent=='操作成功'?'green':'red'
+                          }
+                        }, params.row.orderContent=='操作成功'?params.row.orderContent:'查看详情')
+                      }
                     },
                     {
                         title: '创建时间',
@@ -444,6 +457,7 @@
     .messageList_m .ivu-poptip-inner{
         white-space: normal!important;
         font-size: 14px;
+        top: -50px!important;
     }
     .messageList .ivu-checkbox-inner{
         border: 1px solid #2196F3;

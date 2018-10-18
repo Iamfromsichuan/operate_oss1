@@ -8,22 +8,22 @@
                     <Button type="primary" icon="ios-cloud-download" @click='exportOut'>导出</Button>
                 </div>
                 <div slot="content">
-                    <Select v-model="filter.productCode" filterable placeholder="请选择产品类型" style="width: 350px;">
-                        <Option v-for="(index,key) in producstCode" :value="index.productCode" :key="key">{{ index.productName }}</Option>
-                    </Select>
-                    <Select v-model="filter.channelType" filterable placeholder="请选择渠道类型" style="width: 200px;">
-                        <Option v-for="(index,key) in fromWays" :value="index.dictionaryCode" :key="key">{{ index.dictionaryCode }}</Option>
-                    </Select>
-
-                    <Select v-model="filter.provinceCode" filterable placeholder="请选择省份" style="width: 200px;">
+                    <Select v-model="filter.provinceCode" @on-change="filterProductCode" clearable filterable placeholder="请选择通道" style="width: 200px;">
                         <Option v-for="(index,key) in provenCodes" :value="index.dictionaryCode" :key="key">{{ index.dictionaryName }}</Option>
                     </Select>
 
-                    <Select v-model="filter.smsType" filterable placeholder="请选择短信类型" style="width: 200px;">
+                    <Select v-model="filter.productCode" clearable filterable placeholder="请选择产品名称" style="width: 350px;">
+                        <Option v-for="(index,key) in checkedProducstCode" :value="index.productCode" :key="key">{{ index.productName }}</Option>
+                    </Select>
+                    <Select v-model="filter.channelType" clearable filterable placeholder="请选择渠道类型" style="width: 200px;">
+                        <Option v-for="(index,key) in fromWays" :value="index.dictionaryCode" :key="key">{{ index.dictionaryCode }}</Option>
+                    </Select>
+
+                    <Select v-model="filter.smsType" clearable filterable placeholder="请选择短信类型" style="width: 200px;">
                         <Option v-for="(index,key) in shortType" :value="index.dictionaryName" :key="key">{{ index.dictionaryName }}</Option>
                     </Select>
 
-                    <Select v-model="filter.spCode" filterable placeholder="请选择短信通道编码" style="width: 200px;">
+                    <Select v-model="filter.spCode" clearable filterable placeholder="请选择短信通道编码" style="width: 200px;">
                         <Option v-for="(index,key) in shortWay" :value="index.dictionaryCode" :key="key">{{ index.dictionaryName }}</Option>
                     </Select>
                     <!--<Select v-model="filter.provinceCode" filterable placeholder="请选择产品类型" style="width: 200px;">
@@ -150,6 +150,7 @@
         data() {
             return {
                 producstCode:[],//产品编码集合
+                checkedProducstCode:[],
                 fromWays:[],//渠道类型集合
                 provenCodes:[],//省份类型集合
                 shortType:[],//短信类型集合
@@ -302,6 +303,15 @@
             }
         },
         methods: {
+            filterProductCode(val) {
+              this.checkedProducstCode=[];
+              for(let i =0 ;i < this.producstCode.length ; i ++ ) {
+                 if( this.producstCode[i].passagewayCode === val) {
+                   this.checkedProducstCode.push(this.producstCode[i])
+                 }
+              }
+              console.log(this.checkedProducstCode.length)
+            },
             showWscCode(value){
                 var _that = this
                 var a
@@ -502,7 +512,8 @@
                 })
                     .then(function(res){
                         if(res.status == ERR_OK) {
-                            _that.producstCode = res.data.data.list
+                           console.log(res)
+                            _that.producstCode = res.data.data.list;
                             /*_that.totalRecords = res.data.length*/
                             _that.dataLoading = false
                         }else {
