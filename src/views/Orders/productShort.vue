@@ -338,27 +338,31 @@
                 this.filter.orderEndTime = time[1] ? `${time[1]} 23:59:59` : ''
             },
             search(no) {
-                var _that = this;
-                this.filter.pageNo = no
-                this.dataLoading = true
-                this.orderNos = ''
-                this.checkedDatas = []
-                util.ajax.get(util.baseUrl + '/core/product/sms/list', {
+                if(this.filter.provinceCode) {
+                  var _that = this;
+                  this.filter.pageNo = no
+                  this.dataLoading = true
+                  this.orderNos = ''
+                  this.checkedDatas = []
+                  util.ajax.get(util.baseUrl + '/core/product/sms/list', {
                     params: this.filter
-                })
+                  })
                     .then(function(res){
-                        _that.wscCode =''
-                        _that.dataLoading = false
-                        if(res.status == ERR_OK) {
-                            _that.datas = res.data.data.list
-                            _that.TotalRecords = res.data.data.total
-                        }else {
-                            _that.$Message.error(res)
-                        }
+                      _that.wscCode =''
+                      _that.dataLoading = false
+                      if(res.status == ERR_OK) {
+                        _that.datas = res.data.data.list
+                        _that.TotalRecords = res.data.data.total
+                      }else {
+                        _that.$Message.error(res)
+                      }
                     })
                     .catch(function(err){
-                        console.log(err)
+                      console.log(err)
                     });
+                }else {
+                  _that.$Message.error("请先选择通道")
+                }
             },
             selectItem(arr) {
                 this.checkedDatas = arr;
