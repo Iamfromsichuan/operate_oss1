@@ -361,7 +361,7 @@
                       console.log(err)
                     });
                 }else {
-                  _that.$Message.error("请先选择通道")
+                  this.$Message.error("请先选择通道")
                 }
             },
             selectItem(arr) {
@@ -531,7 +531,6 @@
             },
         },
         created() {
-            this.search(1)
             var _that = this
             util.ajax.get(util.baseUrl + '/kdcu/online/provinceMap/list',{
                 params:{

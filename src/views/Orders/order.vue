@@ -1,4 +1,4 @@
-<!--各个省份的  短信上行  功能  全部集成到此页面-->
+
 <template>
     <div class="messageList messageList_m">
         <Row :gutter="5">
@@ -20,23 +20,27 @@
                 <Input placeholder="电话号码" style="width: 100%" v-model="filter.mobileNumber"></Input>
             </Col>
             <Col span="2">
-                <Input placeholder="订单来源" style="width: 100%" v-model="filter.provinceCode"></Input>
-            </Col>
-            <Col span="2">
                 <Input placeholder="订单类型" style="width: 100%" v-model="filter.productType"></Input>
             </Col>
             <Col span="2">
-                <Input placeholder="请输入网别" style="width: 95%" v-model="filter.netStop"></Input>
+                <Select clearable v-model="filter.netStop" filterable placeholder="请输入网别">
+                    <Option value="23G">23G</Option>
+                    <Option value="4G">4G</Option>
+                </Select>
             </Col>
 
-            <Col span="5">
-                <DatePicker :value="initTime" type="datetimerange" placement="bottom-start" placeholder="导入时间" style="width: 100%" @on-change="changeTime"></DatePicker>
-            </Col>
-
-
-            <Col span="4">
+            <Col span="6">
                 <Button type="primary" icon="ios-search" @click="search(1)">查找</Button>
                 <Button type="success" icon="ios-cloud-download" @click="download">导出</Button>
+                <Button type="success" icon="ios-cloud-download" @click="moreSearch = !moreSearch">更多查找</Button>
+            </Col>
+        </Row>
+        <Row v-if="moreSearch" :gutter="5" style="margin-top: 10px;">
+            <Col span="6">
+                <DatePicker :value="initTime" type="datetimerange" placement="bottom-start" placeholder="导入时间" style="width: 100%" @on-change="changeTime"></DatePicker>
+            </Col>
+            <Col span="4">
+                <Input placeholder="订单编号" style="width: 100%" v-model="filter.orderNo"></Input>
             </Col>
         </Row>
         <br>
@@ -64,11 +68,23 @@
                     <Table border :columns="columns1" :data="objectList.slice(21,24)"></Table>
                 </Col>
             </Row>
-
-
             <!--<div v-for="(item,key) in objectList" style="width: 50%;display: inline-block">
 
             </div>-->
+        </Modal>
+        <Modal v-model="modalCancel" width="360">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span>重新充值订单</span>
+            </p>
+            <div style="text-align:center">
+                <Input v-model="cancelObj.remarks" placeholder="备注"></Input>
+                <p>此操作会重新充值该订单</p>
+                <p>确定重冲么？</p>
+            </div>
+            <div slot="footer">
+                <Button type="error" size="large" long :loading="modal_loading" @click="cancel">确定</Button>
+            </div>
         </Modal>
     </div>
 </template>
@@ -80,7 +96,14 @@
     export default {
         data () {
             return {
+                cancelObj:{
+                  orderNo:'',
+                  remarks:''
+                },
+                modalCancel:false,
+                moreSearch:false,
                 modal1:false,
+                modal_loading:false,
                 items:"",
                 CodeAndName:"",
                 initTime: [`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} 00:00:00`, `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} 23:59:59`],
@@ -93,6 +116,7 @@
                     netStop:"",//网别
                     orderStatus:"",//订单状态
                     provinceCode:"",//省份
+                    orderNo:'',
                     pageNo:1,
                     pageSize: pageSize
                 },
@@ -139,12 +163,22 @@
                         key: 'orderSource'
                     },
                     {
+                       title: '网别',
+                       key: 'netStop'
+                    },
+                    {
                         title: '渠道类型',
                         key: 'channelType'
                     },
                     {
                         title: '订单状态',
-                        key: 'orderStatus'
+                        key: 'orderStatus',
+                        render:(h,params) => {
+                            return h('Span',
+                              {},
+                              params.row.orderStatus === 0 ? '充值中' : params.row.orderStatus === 1 ? '成功' : params.row.orderStatus === 2 ? '失败' : params.row.orderStatus === 3 ? '待查单' : params.row.orderStatus === 4 ? '订单异常' : ''
+                            )
+                        }
                     },
                     {
                         title: '充值说明',
@@ -153,14 +187,14 @@
                         return h('Poptip', {
                           props: {
                             trigger: "hover",
-                            width: params.index===0&&params.row.orderContent.length>100?1000:400,
+                            width: (params.index===0 || params.index===1 || params.index===2)&&(params.row.orderContent.length > 100) ? 1000 : 400,
                             content: params.row.orderContent ? params.row.orderContent : '点击添加'
                           },
                           style: {
                             whiteSpace: 'normal',
-                            color:params.row.orderContent=='操作成功'?'green':'red'
+                            color:(params.row.orderContent=='操作成功' || params.row.orderContent=='订购成功')?'green':'red'
                           }
-                        }, params.row.orderContent=='操作成功'?params.row.orderContent:'查看详情')
+                        }, (params.row.orderContent=='操作成功' || params.row.orderContent=='订购成功')? params.row.orderContent : '查看详情')
                       }
                     },
                     {
@@ -197,36 +231,77 @@
                     {
                         title: '操作',
                         key: 'action',
-                        width: 150,
                         align: 'center',
                         render: (h, params) => {
-                            return h('div', [
+                            if(params.row.orderStatus !== 4) {
+                              return h('div', [
                                 h('Button', {
+                                  props: {
+                                    type: 'warning',
+                                    size: 'small'
+                                  },
+                                  on: {
+                                    click:()=>{
+                                      let _that = this;//foundColumns
+                                      _that.objectList  = [];
+                                      for(let i in params.row) {
+                                        for(let b = 0; b< _that.foundColumns.length ; b++ ) {
+                                          if(i === _that.foundColumns[b].key) {
+                                            let obj = {};
+                                            obj.name = params.row[i];
+                                            _that.objectList.push(Object.assign({},_that.foundColumns[b],obj))
+                                          }
+                                        }
+                                      }
+                                      this.modal1 = true
+                                    }
+                                  }
+                                }, '查看详情'),
+                              ]);
+                            }else {
+                                return h('div', [
+                                  h('Button', {
                                     props: {
-                                        type: 'warning',
-                                        size: 'small'
+                                      type: 'warning',
+                                      size: 'small'
+                                    },
+                                    style : {marginRight:5},
+                                    on: {
+                                      click:()=>{
+                                        let _that = this;//foundColumns
+                                        _that.objectList  = [];
+                                        for(let i in params.row) {
+                                          for(let b = 0; b< _that.foundColumns.length ; b++ ) {
+                                            if(i === _that.foundColumns[b].key) {
+                                              let obj = {};
+                                              obj.name = params.row[i];
+                                              _that.objectList.push(Object.assign({},_that.foundColumns[b],obj))
+                                            }
+                                          }
+                                        }
+                                        this.modal1 = true
+                                      }
+                                    }
+                                  }, '详情'),///core/orders/abnormalEdit
+                                  h('Button', {
+                                    props: {
+                                      type: 'error',
+                                      size: 'small'
+                                    },
+                                    style: {
+                                      marginRight: '5px'
                                     },
                                     on: {
-                                        click:()=>{
-                                            let _that = this;//foundColumns
-                                            _that.objectList  = [];
-                                            for(let i in params.row) {
-                                                for(let b = 0; b< _that.foundColumns.length ; b++ ) {
-                                                    if(i === _that.foundColumns[b].key) {
-                                                        let obj = {};
-                                                        obj.name = params.row[i];
-                                                        _that.objectList.push(Object.assign({},_that.foundColumns[b],obj))
-                                                    }
-                                                }
-                                            }
-                                            this.modal1 = true
-                                        }
+                                      click: () => {
+                                        this.cancelObj.orderNo = params.row.orderNo
+                                        this.modalCancel = true;
+                                      }
                                     }
-                                }, '查看详情'),
-                            ]);
+                                  }, '重冲')
+                                ]);
+                              }
+                            }
                         }
-                    }
-
                 ],
                 foundColumns: [
                     {
@@ -380,7 +455,27 @@
 
             },
             cancel() {
-
+              let _that = this;
+              util.ajax.get(util.baseUrl + '/core/orders/abnormalEdit', {
+                params: {
+                  orderNo : this.cancelObj.orderNo,
+                  remarks:this.cancelObj.remarks
+                }
+              })
+                .then(function(res){
+                  if(res.status == ERR_OK) {
+                    _that.$Message.success("操作成功");
+                    _that.modalCancel = false;
+                    _that.dataLoading = false;
+                    _that.search(1);
+                  }else {
+                    _that.$Message.error(res.msg);
+                    _that.dataLoading = false
+                  }
+                })
+                .catch(function(err){
+                  console.log(err);
+                });
             },
             changeTime(time) {
                 if(time.length) {
