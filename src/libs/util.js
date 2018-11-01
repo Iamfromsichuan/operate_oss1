@@ -19,7 +19,7 @@ util.title = function (title) {
 // http://10.0.128.125:10003
 
 const ajaxUrl = env === 'development'
-    ? 'http://oss.operate.terabyte.com.cn'// 'http://10.0.128.133:10003'//http://10.0.128.111:10003//http://oss.operate.terabyte.com.cn
+    ? 'http://oss.operate.terabyte.com.cn'// 'http://10.0.128.133:10003'//http://10.0.128.111:10003//http://oss.operate.terabyte.com.cn//http://10.0.128.137:10003
     : env === 'production'
     ? 'http://oss.operate.terabyte.com.cn'
     : 'http://oss.operate.terabyte.com.cn';

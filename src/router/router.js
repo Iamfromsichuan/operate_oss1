@@ -209,7 +209,8 @@ export const appRouter = [
         children: [
             { path: 'sgIp', title: 'SP配置', icon: 'email', name: 'sgIp', /* access: 0, */ component: resolve => { require(['@/views/shortMessageModule/sgIp.vue'], resolve); } }, // 需要看一下这种异步加载组建方式
             { path: 'blackList', title: '底层黑名单', icon: 'email', name: 'blackList', /* access: 0, */ component: resolve => { require(['@/views/shortMessageModule/blackList.vue'], resolve); }},
-            { path: 'shortMessageUp', title: '短信上行', icon: 'email', name: 'shortMessageUp', /* access: 0, */ component: resolve => { require(['@/views/shortMessageModule/shortMessageUp.vue'], resolve); }}
+            { path: 'shortMessageUp', title: '短信上行', icon: 'email', name: 'shortMessageUp', /* access: 0, */ component: resolve => { require(['@/views/shortMessageModule/shortMessageUp.vue'], resolve); }},
+            { path: 'shortMessageList', title: '短信列表', icon: 'email', name: 'shortMessageList', /* access: 0, */ component: resolve => { require(['@/views/shortMessageModule/shortMessageList.vue'], resolve); }},
         ]
     },
     {
@@ -238,7 +239,8 @@ export const appRouter = [
             { path: 'exceptionOrder', title: '异常订单', icon: 'email', name: 'exceptionOrder', /* access: 0, */ component: resolve => { require(['@/views/Orders/exceptionOrder.vue'], resolve); } }, // 需要看一下这种异步加载组建方式
             { path: 'order', title: '订单', icon: 'email', name: 'order', /* access: 0, */ component: resolve => { require(['@/views/Orders/order.vue'], resolve); }},
             { path: 'inWay', title: '渠道产品', icon: 'email', name: 'inWay', /* access: 0, */ component: resolve => { require(['@/views/Orders/inWay.vue'], resolve); }},
-            { path: 'productShort', title: '产品短信', icon: 'email', name: 'productShort', /* access: 0, */ component: resolve => { require(['@/views/Orders/productShort.vue'], resolve); }}
+            { path: 'productShort', title: '产品短信', icon: 'email', name: 'productShort', /* access: 0, */ component: resolve => { require(['@/views/Orders/productShort.vue'], resolve); }},
+            { path: 'turnOver', title: '交付订单', icon: 'email', name: 'turnOver', /* access: 0, */ component: resolve => { require(['@/views/Orders/turnOver.vue'], resolve); }},
         ]
     }
     // {
