@@ -4,6 +4,9 @@
             <Col span="2">
                 <Input v-model="filter.productName" placeholder="产品名称" clearable ></Input>
             </Col>
+            <Col span="3">
+                <Input v-model="filter.contactPhone" placeholder="联系电话" clearable ></Input>
+            </Col>
             <Col span="2">
                 <Input v-model="filter.provinceName" placeholder="省份名称" clearable ></Input>
             </Col>
@@ -27,7 +30,7 @@
             <Col span="6">
                 <DatePicker :value="initTime" type="datetimerange" placement="bottom-start" placeholder="导入时间" style="width: 100%" @on-change="changeTime"></DatePicker>
             </Col>
-            <Col span="4">
+            <Col span="3">
                 <Button type="primary" icon="ios-search" @click='search(1)'>查找</Button>
                 <Button type="primary" icon="ios-cloud-download" @click='downloadFile'>下载</Button>
             </Col>
@@ -47,16 +50,39 @@
             </div>
         </div>
         <!-- 删除 -->
-        <Modal v-model="modalDelete" width="320">
+        <Modal v-model="modalEditor" width="320">
             <p slot="header" style="color:#f60;text-align:center">
                 <Icon type="information-circled"></Icon>
-                <span>删除订单</span>
+                <span>订单回访</span>
             </p>
-            <div style="text-align:center">
-                <Input  type="password" :autosize="true" placeholder="请验证当前用户密码"></Input>
+            <RadioGroup v-model="editor.trackStatus">
+                <p>待跟进</p>
+                <Radio label="301">未接</Radio>
+                <Radio label="302">挂断</Radio>
+                <Radio label="303">线路忙</Radio>
+                <Radio label="304">关机</Radio>
+                <Radio label="305">回头联系</Radio>
+                <Radio label="306">次月办理</Radio>
+                <Radio label="307">其他</Radio>
+                <hr>
+                <p>关闭</p>
+                <Radio label="1">成功办理</Radio>
+                <Radio label="2">失败</Radio>
+                <Radio label="201">语言不通</Radio>
+                <Radio label="202">点错</Radio>
+                <Radio label="203">无法配送</Radio>
+                <Radio label="204">不办理</Radio>
+                <Radio label="205">非王卡套餐</Radio>
+                <Radio label="206">要换套餐</Radio>
+            </RadioGroup>
+            <hr>
+            <div>
+                <p>备注</p>
+                <Input v-model="editor.remarks" type="textarea" :rows="2" placeholder="Enter something..." />
+                <!--v-model="value6"-->
             </div>
             <div slot="footer">
-                <Button type="primary" size="large" long :loading="modal_loading">确认</Button>
+                <Button type="primary" size="large" long :loading="modal_loading" @click="subOrder">确认</Button>
             </div>
         </Modal>
     </div>
@@ -71,7 +97,7 @@
   export default {
     data() {
       return {
-        modalDelete:false,
+        modalEditor:false,
         byte:"",
         InputList:[],//表中有多个字段
         loading:"",
@@ -93,6 +119,7 @@
           cityName:'',
           productName:'',
           provinceName:'',
+          contactPhone:''
         },
         TotalRecords: 0,
         columns: [
@@ -205,7 +232,13 @@
                   },
                   on: {
                     click: () => {
-                      util.changeState.call(this,"开启",params)
+                      if(params.row.orderStatus === -1) {
+                        this.modalEditor = true;
+                        this.editor.orderNo = params.row.orderNo;
+                        this.editor.productCode = params.row.productCode
+                      }else {
+                        this.$Message.error("订单已关闭，不可修改")
+                      }
                     }
                   }
                 }, '修改'),
@@ -338,9 +371,59 @@
               statusDes:'其他(关闭)'
           }*/
         ],
+        editor: {//editor.remarks
+          orderNo:'',
+          orderStatus:'',
+          trackStatus:'',
+          remarks:'',
+          productCode:'',
+          obligate:''
+        },
       }
     },
     methods: {
+      subOrder() {
+        let _that = this ;
+        console.log(this.editor.trackStatus)
+        if(this.editor.trackStatus) {
+          this.dataLoading = true;
+          let isTrue = false;
+          let arr = [-1,301,302,303,304,305,306,307];
+          for (let i = 0 ; i < arr.length ; i++) {//为false 是待处理   为true  就是关闭
+            if(arr[i] == this.editor.trackStatus) {
+              isTrue = true;
+            }
+          }
+          if(isTrue) {
+            this.editor.orderStatus = -1//待处理订单
+          }else {
+            if(this.editor.trackStatus == 2) {
+              this.editor.orderStatus = 2//失败
+            }else if(this.editor.trackStatus == 1) {
+              this.editor.orderStatus = 1//成功
+            }else {
+              this.editor.orderStatus = 2//失败
+            }
+          }
+          util.ajax.get(util.baseUrl + '/core/orders/delivery/update', {
+            params: this.editor
+          })
+            .then(function(res){
+              _that.dataLoading = false;
+              if(res.data.status == ERR_OK) {
+                _that.modalEditor = false;
+                _that.search(_that.filter.pageNo)
+              }else {
+                _that.$Message.error(res.data.msg)
+              }
+            })
+            .catch(function(err){
+              console.log(err)
+            });
+        }else {
+          this.$Message.error("请选择需要修改的状态")
+        }
+      },
       changeTime(time) {
         if(time.length) {
           this.filter.startTime = time[0]
