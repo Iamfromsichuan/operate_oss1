@@ -19,7 +19,6 @@
                 <Tooltip content="删除电话号缓存次数">
                     <Button type="error" icon="ios-trash-outline" @click="deleteCache">删除次数</Button>
                 </Tooltip>
-
             </Col>
         </Row>
         <br>
@@ -79,6 +78,18 @@
                 <Button type="ghost" style="margin-left: 8px" @click="deleteThen">取消</Button>
             </div>
         </Modal>
+
+        <Modal v-model="modal1DeleteList" >
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="ios-information-circle"></Icon>
+                <span>删除黑名单号码：</span>
+            </p>
+            <p style="text-align: center">确定从黑名单中删除<span style="color: red;padding: 0 10px">{{deleteList.phone}}</span>吗？</p>
+            <div slot="footer" style="text-align: right">
+                <Button type="success" :loading="modal_loading" @click="deleteSubmit1">确定</Button>
+                <Button type="ghost" style="margin-left: 8px" @click="deleteThen1">取消</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -89,6 +100,10 @@ import {ERR_OK,pageSize} from '@/config/config'
 export default {
     data () {
         return {
+            deleteList:{
+              phone:''
+            },
+            modal1DeleteList:false,
             modal1Delete:false,
             t1:true,
             columns2:[
@@ -155,12 +170,52 @@ export default {
                 {
                     title: '备注',
                     key: 'remarks'
-                }
+                },
+               {
+                 title: '操作',
+                 key: '',
+                 render : (h,params) => {
+                   return  h('Button',{
+                     props:{
+                       icon : 'close',
+                       size: 'small',
+                       type: 'error'
+                     },
+                     on : {
+                       click : () => {
+                            this.deleteList.phone = params.row.phone;
+                            this.modal1DeleteList = true
+                       }
+                     }
+                   })
+                 }
+               }
             ],
             datas: []
         }
     },
     methods: {
+        deleteSubmit1() {
+          var _that = this
+          util.ajax.get(util.baseUrl + '/contact/sgipPhoneBlack/deletePhone',{
+            params:{
+              phone:_that.deleteList.phone
+            }
+          })
+            .then(function(res){
+                if(res.status == 200) {
+                  _that.modal1DeleteList = false;
+                  _that.$Message.success(res.data.msg);
+                  _that.search(1);
+                }
+            })
+            .catch(function(err){
+              console.log(err);
+            });
+        },
+        deleteThen1() {
+          this.modal1DeleteList = false
+        },
         deleteThen() {
             this.modal1Delete = false
         },
@@ -261,9 +316,13 @@ export default {
                 params:_that.changefilter
             })
                 .then(function(res){
-                    _that.dataLoading = false
-                    _that.modalAdd = false
-                    _that.search(1)
+                  console.log(res.status)
+                    if(res.status == 200) {
+                      _that.dataLoading = false
+                      _that.modalAdd = false
+                      _that.$Message.success(res.data.msg);
+                      _that.search(1)
+                    }
 
                 })
                 .catch(function(err){

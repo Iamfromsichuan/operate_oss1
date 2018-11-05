@@ -1,7 +1,7 @@
 <template>
   <div class="quickFilter">
     <ul class="listContent">
-      <li v-for='(item, index) in taglist' class="listItem" key="index" @click='checkTag(index)' :class="{active : checkedIndex == index}">{{item}}</li>
+      <li v-for='(item, index) in taglist' class="listItem" :key="index" @click='checkTag(index)' :class="{active : checkedIndex == index}">{{item}}</li>
     </ul>
   </div>
 </template>
@@ -16,7 +16,7 @@
     },
     data() {
       return {
-        checkedIndex: 0
+        checkedIndex: 3
       }
     },
     methods: {
@@ -50,7 +50,7 @@
         box-sizing: border-box;
         background: #2196f3;
         color: #fff;
-        border-radius: 0 solid #2196f3
+        border-radius: 0 solid #2196f3;
       }
     }
   }

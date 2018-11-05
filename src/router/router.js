@@ -87,7 +87,6 @@ export const appRouter = [
         // access: 0,
         component: Main,
         children: [
-            { path: 'messageList', title: '短信列表', icon: 'android-list', name: 'messageList_index', /* access: 0, */ component: resolve => { require(['@/views/gzcu/messageList.vue'], resolve); } },
             { path: 'sendMessage', title: '发送短信', icon: 'android-open', name: 'sendMessage_index', /* access: 0, */ component: resolve => { require(['@/views/gzcu/sendMessage.vue'], resolve); } },
             // { path: 'messageUp', title: '短信上行', icon: 'paper-airplane', name: 'messageUp_index', /*access: 0,*/ component: resolve => { require(['@/views/gzcu/messageUp.vue'], resolve); } },
             { path: 'sendCsvMessage', title: '批发短信', icon: 'email', name: 'sendCsvMessage_index', /* access: 0, */ component: resolve => { require(['@/views/gzcu/sendCsvMessage.vue'], resolve); } }
@@ -101,7 +100,6 @@ export const appRouter = [
         // access: 0,
         component: Main,
         children: [
-            { path: 'messageListHN', title: '短信列表', icon: 'android-list', name: 'messageListHN_index', /* access: 0, */ component: resolve => { require(['@/views/hncu/messageListHN.vue'], resolve); } },
             { path: 'sendMessageHN', title: '发送短信', icon: 'android-open', name: 'sendMessageHN_index', /* access: 0, */ component: resolve => { require(['@/views/hncu/sendMessageHN.vue'], resolve); } },
             // { path: 'messageUpHN', title: '短信上行', icon: 'paper-airplane', name: 'messageUpHN_index', /*access: 0,*/ component: resolve => { require(['@/views/hncu/messageUpHN.vue'], resolve); } },
             { path: 'sendCsvMessageHN', title: '批发短信', icon: 'email', name: 'sendCsvMessageHN_index', /* access: 0, */ component: resolve => { require(['@/views/hncu/sendCsvMessageHN.vue'], resolve); } },
@@ -116,7 +114,6 @@ export const appRouter = [
         // access: 0,
         component: Main,
         children: [
-            { path: 'messageListCQ', title: '短信列表', icon: 'android-list', name: 'messageListCQ_index', /* access: 0, */ component: resolve => { require(['@/views/cqcu/messageListCQ.vue'], resolve); } },
             { path: 'sendMessageCQ', title: '发送短信', icon: 'android-open', name: 'sendMessageCQ_index', /* access: 0, */ component: resolve => { require(['@/views/cqcu/sendMessageCQ.vue'], resolve); } },
             // { path: 'messageUpCQ', title: '短信上行', icon: 'paper-airplane', name: 'messageUpSC_index', /*access: 0,*/ component: resolve => { require(['@/views/cqcu/messageUpCQ.vue'], resolve); } },
             { path: 'sendCsvMessageCQ', title: '批发短信', icon: 'email', name: 'sendCsvMessageCQ_index', /* access: 0, */ component: resolve => { require(['@/views/cqcu/sendCsvMessageCQ.vue'], resolve); } }
@@ -130,7 +127,6 @@ export const appRouter = [
         // access: 0,
         component: Main,
         children: [
-            { path: 'messageListSC', title: '短信列表', icon: 'android-list', name: 'messageListSC_index', /* access: 0, */ component: resolve => { require(['@/views/sccu/messageListSC.vue'], resolve); } },
             { path: 'sendMessageSC', title: '发送短信', icon: 'android-open', name: 'sendMessageSC_index', /* access: 0, */ component: resolve => { require(['@/views/sccu/sendMessageSC.vue'], resolve); } },
             // { path: 'messageUpSC', title: '短信上行', icon: 'paper-airplane', name: 'messageUpSC_index', /*access: 0,*/ component: resolve => { require(['@/views/sccu/messageUpSC.vue'], resolve); } },
             { path: 'sendCsvMessageSC', title: '批发短信', icon: 'email', name: 'sendCsvMessageSC_index', /* access: 0, */ component: resolve => { require(['@/views/sccu/sendCsvMessageSC.vue'], resolve); } }

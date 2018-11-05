@@ -1,6 +1,43 @@
 <template>
-    <div class="complain_nation">
-        <Row :gutter="10" style="margin: 10px 0">
+    <div class="complain_nation2">
+        <QuickFilter :taglist="tagList" @gettagIndex='gettagIndex'></QuickFilter>
+        <Collapse v-model="collapseName" style="margin: 10px 0">
+            <Panel name="1">
+                <div style="display:inline-block;float: left;margin-right: 10px" @click.stop>
+                    <Select v-model="filter.provinceName" :clearable="true" placeholder="地市" style="width: 100px;">
+                        <Option value="重庆">重庆</Option>
+                        <Option value="新疆">新疆</Option>
+                    </Select>
+                   <!-- <DatePicker :value="initTime" type="datetimerange" placement="bottom-start" placeholder="导入时间" style="width: 300px" @on-change="changeTime"></DatePicker>-->
+                    <!--<DatePicker type="date" :start-date="new Date(1991, 4, 14)" placeholder="Select date" style="width: 200px"></DatePicker>-->
+                    <DatePicker type="datetimerange" format="yyyy-MM-dd" placeholder="Select date and time(Excluding seconds)" style="width: 200px"  :value="initTime" @on-change="changeTime"></DatePicker>
+                    <Button type="primary" icon="ios-search" @click='search(1)'>查找</Button>
+                    <Button type="primary" icon="ios-cloud-download" @click='downloadFile'>导出</Button>
+                </div>
+                <div slot="content">
+                    <Select v-model="filter.productType" placeholder="业务类型" style="width: 100px;">
+                        <Option value="低消" key="1">低消</Option>
+                        <Option value="月包" key="2">月包</Option>
+                        <Option value="内容包" key="3">内容包</Option>
+                        <Option value="畅越" key="4">畅越</Option>
+                        <Option value="其他" key="5">其他</Option>
+                    </Select>
+                    <Select v-model="filter.provinceName" :clearable="true" placeholder="地市" style="width: 100px;">
+                        <Option value="重庆">重庆</Option>
+                        <Option value="新疆">新疆</Option>
+                    </Select>
+                    <Select clearable v-model="filter.orderStatus" filterable placeholder="请选择订单状态" style="width: 100px;margin-right: 10px">
+                        <Option value="-1" :key="">待处理</Option>
+                        <Option value="1" :key="">成功</Option>
+                        <Option value="2" :key="">失败</Option>
+                    </Select>
+                </div>
+                <div style="display:inline-block;float: right;margin-right: 10px;width: 150px" @click.stop>
+                    <Input icon="search" placeholder="电话号码" style="width: 90%" v-model='filter.contactPhone' @on-click="search(1)"></Input>
+                </div>
+            </Panel>
+        </Collapse>
+      <!--  <Row :gutter="10" style="margin: 10px 0">
             <Col span="2">
                 <Input v-model="filter.productName" placeholder="产品名称" clearable ></Input>
             </Col>
@@ -18,11 +55,11 @@
             </Col>
             <Col span="2">
                 <Input v-model="filter.trackStatus" placeholder="跟单状态" clearable ></Input>
-                <!--<Select clearable v-model="filter.procStatus" filterable placeholder="请选择处理状态">
+                &lt;!&ndash;<Select clearable v-model="filter.procStatus" filterable placeholder="请选择处理状态">
                     <Option value="-1" :key="">未处理</Option>
                     <Option value="1" :key="">成功</Option>
                     <Option value="2" :key="">无效</Option>
-                </Select>-->
+                </Select>&ndash;&gt;
             </Col>
             <Col span="2">
                 <Input v-model="filter.orderSource" placeholder="订单来源" clearable ></Input>
@@ -34,7 +71,7 @@
                 <Button type="primary" icon="ios-search" @click='search(1)'>查找</Button>
                 <Button type="primary" icon="ios-cloud-download" @click='downloadFile'>下载</Button>
             </Col>
-        </Row>
+        </Row>-->
         <Table
                 :columns="columns"
                 :data="datas"
@@ -78,7 +115,7 @@
             <hr>
             <div>
                 <p>备注</p>
-                <Input v-model="editor.remarks" type="textarea" :rows="2" placeholder="Enter something..." />
+                <Input v-model="editor.remarks" type="textarea" :rows="2" placeholder="请填写备注" />
                 <!--v-model="value6"-->
             </div>
             <div slot="footer">
@@ -93,15 +130,18 @@
   import util from '@/libs/util';
   import Cookies from 'js-cookie';
   import {ERR_OK,pageSize} from '@/config/config'
+  import QuickFilter from '@/views/main-components/quickFilter'
 
   export default {
     data() {
       return {
+        tagIndex:'',
+        collapseName:'',
+        tagList: [ '亲情卡','不限量', '宽带', '回访订单'],
         modalEditor:false,
         byte:"",
         InputList:[],//表中有多个字段
         loading:"",
-        collapseName: '1',
         remark:"",
         // 详情框
         initTime: [`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} 00:00:00`, `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} 23:59:59`],
@@ -112,46 +152,55 @@
           pageNo: 1,
           pageSize: pageSize,
           trackStatus:'',
-          orderStatus:'',
+          orderStatus:-1,
           orderSource:'',
           startTime: '',
           endTime: '',
           cityName:'',
           productName:'',
           provinceName:'',
-          contactPhone:''
+          contactPhone:'',
+          productType:'1'//回访订单
         },
         TotalRecords: 0,
         columns: [
           {
-            title: '订单号',
+            title: '业务',
             align: 'center',
-            key: 'orderNo',
+            key: 'productType'
           },
           {
-            title: '订单时间',
-            align: 'center',
-            key: 'createTime'
-          },
-          {
-            title: '联系号码',
+            title: '用户号码',
             align: 'center',
             key: 'contactPhone'
           },
-          {
-            title: '来源',
-            align: 'center',
-            key: 'orderSource'
-          },
+
           {
             title: '产品名称',
             align: 'center',
-            key: 'productName'
+            key: 'productName',
+            render: (h, params) => {
+              return h('div', {}, [
+                h('Tooltip', {
+                  props: {
+                    content: params.row.productName,
+                    placement: 'top-start'
+                  },
+                  style: {
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textAlign: 'center',
+                    width: '60px'
+                  }
+                }, params.row.productName)
+              ])
+            }
           },
           {
-            title: '业务分类',
+            title: '渠道',
             align: 'center',
-            key: 'productType'
+            key: 'orderSource'
           },
           {
             title: '省份',
@@ -182,9 +231,38 @@
             }
           },
           {
+            title: '创建时间',
+            align: 'center',
+            key: 'createTime',
+            render: (h, params) => {
+              return h('div', {
+                /*on: {
+                  dblclick: () => {
+                    this.modalDetail = true
+                    this.infoDetail = params.row
+                  }
+                }*/
+              }, [
+                h('Tooltip', {
+                  props: {
+                    content: params.row.createTime,
+                    placement: 'top-start'
+                  },
+                  style: {
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textAlign: 'left'
+                  }
+                }, params.row.createTime.split(" ")[0])
+              ])
+            }
+          },
+          {
             title: '跟单状态',
             align: 'center',
             key: 'trackStatus',
+            className: 'demo-table-info-column',
             render : (h,params) => {
               let name ;
               for(let i = 0 ; i < this.statusList.length ; i ++) {
@@ -192,102 +270,146 @@
                   name = this.statusList[i].statusDes;
                 }
               }
-              return h('span',{},name)
+              return h('span',{
+                style : {
+                  color : '#2d8cf0'
+                },
+                on : {
+                    click : () => {
+                      console.log(1)
+                    }
+                }
+              },name)
+            }
+          },
+          {
+            title: '修改',
+            align: 'center',
+            render: (h, params) => {
+              return h('Button', {
+                props: {
+                  icon: 'edit',
+                  size: 'small',
+                  type: (params.row.orderStatus == '-1') ? 'warning' : 'default'
+                },
+                on: {
+                  click: () => {
+                    if(params.row.orderStatus === -1) {
+                      this.modalEditor = true;
+                      this.editor.orderNo = params.row.orderNo;
+                      this.editor.productCode = params.row.productCode
+                    }else {
+                      this.$Message.error("订单已关闭，不可修改")
+                    }
+                  }
+                }
+              })
             }
           },
           {
             title: '跟单时间',
             align: 'center',
-            key: 'updateTime'
+            key: 'updateTime',
+            render: (h, params) => {
+              return h('div', {
+                /*on: {
+                  dblclick: () => {
+                    this.modalDetail = true
+                    this.infoDetail = params.row
+                  }
+                }*/
+              }, [
+                h('Tooltip', {
+                  props: {
+                    content: params.row.updateTime,
+                    placement: 'top-start'
+                  },
+                  style: {
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textAlign: 'left'
+                  }
+                }, params.row.updateTime.split(" ")[0])
+              ])
+            }
+          },
+          {
+            title: '跟单人',
+            align: 'center',
+            key: 'receiver'
+          },
+          {
+            title: '地址',
+            align: 'center',
+            key: 'contactAddress',
+            render: (h, params) => {
+                if(params.row.contactAddress) {
+                  return h('div', {}, [
+                    h('Tooltip', {
+                      props: {
+                        content: params.row.contactAddress,
+                        placement: 'top-start'
+                      },
+                      style: {
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        textAlign: 'center',
+                        width: '60px'
+                      }
+                    }, params.row.contactAddress)
+                  ])
+                }else {
+                    return ''
+                }
+            }
           },
           {
             title: '备注',
             align: 'center',
-            key: 'remarks'
-          },
-          {
-            title: '锁定状态',
-            align: 'center',
-            key: 'lockStatus'
-          },
-          {
-            title: '锁定时间',
-            align: 'center',
-            key: 'lockTime'
-          },
-          {
-            title: 'Action',
-            key: 'action',
-            width: 150,
-            align: 'center',
+            key: 'remarks',
             render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small',
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      if(params.row.orderStatus === -1) {
-                        this.modalEditor = true;
-                        this.editor.orderNo = params.row.orderNo;
-                        this.editor.productCode = params.row.productCode
-                      }else {
-                        this.$Message.error("订单已关闭，不可修改")
-                      }
+              if(params.row.remarks) {
+                return h('div', {}, [
+                  h('Tooltip', {
+                    props: {
+                      content: params.row.remarks,
+                      placement: 'top-start'
+                    },
+                    style: {
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      textAlign: 'center',
+                      width: '60px'
                     }
+                  }, params.row.remarks)
+                ])
+              }else {
+                return ''
+              }
+            }
+          },
+          {
+            title: '锁定',
+            key: 'action',
+            align: 'center',
+            className: 'demo-table-info-column',
+            render : (h,params) => {
+              return h('Button', {
+                props: {
+                  icon: 'locked',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.modalRefundMarks = true;
+                    this.editOrderNo = params.row.orderNo;
+                    this.refundRmarks = params.row.returnText ? params.row.returnText : `【${params.row.mobileNumber}】于【${params.row.orderData}】订购【${params.row.orderProduct}】业务。用户表示非本人订购，要求退费。与用户协商结果如下:\r\rXXXXXXX\r\r,用户表示满意。以下是该用户的所有订购截图，（如没有截图请联系4000126559）`
                   }
-                }, '修改'),
-                h('Button', {
-                  props: {
-                    type: 'error',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      console.log(1)
-                      util.changeState.call(this,"关闭",params)
-                    }
-                  }
-                }, '日志'),
-                h('Button', {
-                  props: {
-                    type: 'warning',
-                    size: 'small'
-                  },
-
-                  on: {
-                    click: () => {
-                      this.modalAdd = true
-                      this.if_add = false
-                      this.formItem = {
-                        customer: Cookies.get('user'), //客服
-                        mobileNumber: '', //电话号
-                        province: params.row.province, // 省份
-                        businessType: '月包', // 业务类型
-                        isEnable: params.row.isEnable,  //是否启用 0关闭 1 启用
-                        wscCode: params.row.wscCode, // 沃视窗编码
-                        name: params.row.name, // 退费来源
-                        code: params.row.code, // 省份编码 主键
-                        returnText: '用户否认订购行为。', // 回单文本
-                        remarks: params.row.remarks, // 备注
-                      }
-                      if(params.row.isEnable == "关闭"){
-                        this.formItem.isEnable = 0
-                      }else if(params.row.isEnable == "开启"){
-                        this.formItem.isEnable = 1
-                      }
-                    }
-                  }
-                }, '详情')
-              ]);
+                }
+              })
             }
           }
         ],
@@ -382,6 +504,26 @@
       }
     },
     methods: {
+      /*rowClassName (row, index) {
+        if (index === 1) {
+          return 'demo-table-info-row';
+        }
+        return '';
+      },*/
+      gettagIndex(index) {
+        this.tagIndex = index;
+        this.filter.productType = '亲情卡';
+        if(index === -1 || index === 0) {
+            this.filter.productType = '亲情卡';
+        }else if(index === 1){
+          this.filter.productType = '不限量';
+        }else if(index === 2) {
+          this.filter.productType = '宽带';
+        }else if(index === 3) {
+          this.filter.productType = '回访';
+        }
+        this.search(1)
+      },
       subOrder() {
         let _that = this ;
         console.log(this.editor.trackStatus)
@@ -404,7 +546,7 @@
             }else {
               this.editor.orderStatus = 2//失败
             }
-          }
+          };
           util.ajax.get(util.baseUrl + '/core/orders/delivery/update', {
             params: this.editor
           })
@@ -426,12 +568,14 @@
       },
       changeTime(time) {
         if(time.length) {
-          this.filter.startTime = time[0]
-          this.filter.endTime = time[1]
+          this.filter.startTime = time[0] + " " +"00:00:00";
+          this.filter.endTime = time[1] + " " + "23:59:59"
         }else {
           this.filter.startTime = ''
           this.filter.endTime = ''
         }
+        console.log(this.filter.startTime)
+        console.log(this.filter.endTime)
       },
       search(no) {
         var _that = this;
@@ -475,6 +619,7 @@
         window.location.href = `${util.baseUrl}/core/orders/delivery/export?token=${Cookies.get('token')}${util.parseParam(downObj)}`
       }
     },
+    components: {QuickFilter},//Statistic
     created() {
       this.filter.startTime = this.initTime[0];
       this.filter.endTime = this.initTime[1];
@@ -483,15 +628,27 @@
   }
 </script>
 <style type="text/css">
-    .complain_nation .ivu-table-cell{
+    .complain_nation2 .ivu-table-cell{
         padding: 0;
     }
-    .complain_nation .page{
+    .complain_nation2 .page{
         background: #fff;
         position: fixed;
         width: 100%;
         bottom: 0;
         z-index: 999999;
+    }
+    .complain_nation2 .ivu-collapse>.ivu-collapse-item>.ivu-collapse-header {
+        padding-left: 10px;
+    }
+    .ivu-table thead .demo-table-info-column {
+        border-left: none;
+    }
+    .ivu-table .demo-table-info-column{
+       border-left: 1px solid blue;
+    }
+    .ivu-table .demo-table-info-row {
+        border-left: none!important;
     }
 </style>
 

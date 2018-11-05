@@ -534,8 +534,8 @@
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
-            }
-            const baseWidth = 'auto'
+            };
+            const baseWidth = 'auto';
             return {
                 // 详情框
                 modalDetail: false,
@@ -1688,21 +1688,21 @@
                     internalOtherTotalMoney: 0
                 }
                 dataArr.map(item => {
-                    _total.oneLowTotalCount += item.oneLowTotalCount
-                    _total.oneLowTotalMoney += item.oneLowTotalMoney
-                    _total.internalLowTotalCount += item.internalLowTotalCount
-                    _total.internalLowTotalMoney += item.internalLowTotalMoney
-                    _total.oneMonthTotalCount += item.oneMonthTotalCount
-                    _total.oneMonthTotalMoney += item.oneMonthTotalMoney
-                    _total.internalMonthTotalCount += item.internalMonthTotalCount
-                    _total.internalMonthTotalMoney += item.internalMonthTotalMoney
-                    _total.oneContentTotalCount += item.oneContentTotalCount
-                    _total.oneContentTotalMoney += item.oneContentTotalMoney
-                    _total.internalContentTotalCount += item.internalContentTotalCount
-                    _total.internalContentTotalMoney += item.internalContentTotalMoney
-                    _total.oneOtherTotalCount += item.oneOtherTotalCount
-                    _total.oneOtherTotalMoney += item.oneOtherTotalMoney
-                    _total.internalOtherTotalCount += item.internalOtherTotalCount
+                    _total.oneLowTotalCount += item.oneLowTotalCount;
+                    _total.oneLowTotalMoney += item.oneLowTotalMoney;
+                    _total.internalLowTotalCount += item.internalLowTotalCount;
+                    _total.internalLowTotalMoney += item.internalLowTotalMoney;
+                    _total.oneMonthTotalCount += item.oneMonthTotalCount;
+                    _total.oneMonthTotalMoney += item.oneMonthTotalMoney;
+                    _total.internalMonthTotalCount += item.internalMonthTotalCount;
+                    _total.internalMonthTotalMoney += item.internalMonthTotalMoney;
+                    _total.oneContentTotalCount += item.oneContentTotalCount;
+                    _total.oneContentTotalMoney += item.oneContentTotalMoney;
+                    _total.internalContentTotalCount += item.internalContentTotalCount;
+                    _total.internalContentTotalMoney += item.internalContentTotalMoney;
+                    _total.oneOtherTotalCount += item.oneOtherTotalCount;
+                    _total.oneOtherTotalMoney += item.oneOtherTotalMoney;
+                    _total.internalOtherTotalCount += item.internalOtherTotalCount;
                     _total.internalOtherTotalMoney += item.internalOtherTotalMoney
                 })
                 dataArr.unshift(_total)
