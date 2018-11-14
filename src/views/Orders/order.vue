@@ -1,58 +1,51 @@
 
 <template>
     <div class="messageList messageList_m">
-        <Row :gutter="5">
-            <Col span="3">
-                <Select clearable v-model="filter.provinceCode" filterable placeholder="请选择省份名称">
-                    <Option v-for="item in items" :value="item.dictionaryCode" :key="item.dictionaryCode">{{ item.dictionaryName }}</Option>
-                </Select>
-            </Col>
-            <Col span="3">
-                <Select clearable v-model="filter.orderStatus" filterable placeholder="请选择订单状态">
-                    <Option value="0">充值中</Option>
-                    <Option value="1">成功</Option>
-                    <Option value="2">失败</Option>
-                    <Option value="3">待查单</Option>
-                    <Option value="4">订单异常</Option>
-                </Select>
-            </Col>
-            <Col span="3">
-                <Input placeholder="电话号码" style="width: 100%" v-model="filter.mobileNumber"></Input>
-            </Col>
-            <Col span="2">
-                <Input placeholder="订单类型" style="width: 100%" v-model="filter.productType"></Input>
-            </Col>
-            <Col span="2">
-                <Select clearable v-model="filter.netStop" filterable placeholder="请输入网别">
-                    <Option value="23G">23G</Option>
-                    <Option value="4G">4G</Option>
-                </Select>
-            </Col>
-
-            <Col span="6">
-                <Button type="primary" icon="ios-search" @click="search(1)">查找</Button>
-                <Button type="success" icon="ios-cloud-download" @click="download">导出</Button>
-                <Button type="success" icon="ios-cloud-download" @click="moreSearch = !moreSearch">更多查找</Button>
-            </Col>
-        </Row>
-        <Row v-if="moreSearch" :gutter="5" style="margin-top: 10px;">
-            <Col span="6">
-                <DatePicker :value="initTime" type="datetimerange" placement="bottom-start" placeholder="导入时间" style="width: 100%" @on-change="changeTime"></DatePicker>
-            </Col>
-            <Col span="4">
-                <Input placeholder="订单编号" style="width: 100%" v-model="filter.orderNo"></Input>
-            </Col>
-        </Row>
+        <Collapse v-model="collapseName" style="margin: 10px 0">
+            <Panel name="1">
+                <div style="display:inline-block;float: left;margin-right: 10px" @click.stop>
+                    <Select clearable v-model="filter.provinceCode" filterable placeholder="省份" style="width: 100px;">
+                        <Option v-for="item in items" :value="item.dictionaryCode" :key="item.dictionaryCode">{{ item.dictionaryName }}</Option>
+                    </Select>
+                    <DatePicker type="datetimerange" format="yyyy-MM-dd" placeholder="请选择查询时间" style="width: 200px"  :value="initTime" @on-change="changeTime"></DatePicker>
+                    <Button type="primary" icon="ios-search" @click="search(1)">查找</Button>
+                    <Button type="success" icon="ios-cloud-download" @click="download">导出</Button>
+                </div>
+                <div slot="content">
+                    <Select clearable v-model="filter.orderStatus" filterable placeholder="订单状态" style="width: 100px;">
+                        <Option value="0">充值中</Option>
+                        <Option value="1">成功</Option>
+                        <Option value="2">失败</Option>
+                        <Option value="3">待查单</Option>
+                        <Option value="4">订单异常</Option>
+                        <Option value="5">手工补充</Option>
+                    </Select>
+                    <Input placeholder="订单类型" style="width: 100px" v-model="filter.productType"></Input>
+                    <Select clearable v-model="filter.netStop" filterable placeholder="网别 " style="width: 100px;">
+                        <Option value="23G">23G</Option>
+                        <Option value="4G">4G</Option>
+                    </Select>
+                    <Input placeholder="订单编号" style="width: 200px" v-model="filter.orderNo" ></Input>
+                </div>
+                <div style="display:inline-block;float: right;margin-right: 10px;width: 150px" @click.stop>
+                    <Input icon="search" placeholder="电话号码" style="width: 90%" v-model='filter.mobileNumber' @on-click="search(1)"></Input>
+                </div>
+            </Panel>
+        </Collapse>
         <br>
         <Table :columns="columns" :data="datas" :loading="dataLoading"></Table>
-        <br>
-        <Page :total="totalRecords" :current="filter.pageNo" @on-change='changePage' :page-size="filter.pageSize"></Page>
-        <br>
+        <div class="page">
+            <Page :total="TotalRecords" :current="filter.pageNo" @on-change='changePage' :page-size="filter.pageSize" show-elevator show-sizer placement="top" :page-size-opts="pageConfig" @on-page-size-change="changePageSize" style="display: inline-block;vertical-align: middle;"></Page>
+            <div class="records" style="display: inline-block;height: 32px;line-height: 32px;margin-left: 5%;">
+                当前共<span style="color: #f00;font-weight: bold;"> {{TotalRecords}} </span>条记录
+            </div>
+        </div>
+        <!-- @on-cancel="cancel"-->
         <Modal
                 v-model="modal1"
                 width="1200"
                 @on-ok="ok"
-                @on-cancel="cancel">
+               >
             <p slot="header" style="color:#f60;text-align:center">
                 <Icon type="information-circled"></Icon>
                 <span>详情展示</span>
@@ -68,9 +61,6 @@
                     <Table border :columns="columns1" :data="objectList.slice(21,24)"></Table>
                 </Col>
             </Row>
-            <!--<div v-for="(item,key) in objectList" style="width: 50%;display: inline-block">
-
-            </div>-->
         </Modal>
         <Modal v-model="modalCancel" width="360">
             <p slot="header" style="color:#f60;text-align:center">
@@ -86,6 +76,27 @@
                 <Button type="error" size="large" long :loading="modal_loading" @click="cancel">确定</Button>
             </div>
         </Modal>
+        <Modal v-model="modalAgain" width="400">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span>手工补充订单</span>
+            </p>
+            <div style="text-align:center">
+                <Input v-model="againObj.mobileNumber" placeholder="电话号码" disabled style="margin-bottom: 10px;"></Input>
+                <Input v-model="againObj.productName" placeholder="名称" disabled style="margin-bottom: 10px;"></Input>
+                <RadioGroup v-model="againObj.orderStatus" @on-change="updateItem" style="margin-bottom: 10px;">
+                    <Radio label="1">成功</Radio>
+                    <Radio label="2">失败</Radio>
+                    <Radio label="6">重复订购</Radio>
+                </RadioGroup>
+                <Input v-show="againObj.content" v-bind:value="againObj.content" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="Enter something..." disabled style="margin-bottom: 10px;"/>
+                <Input v-show="againObj.content" v-bind:value="againObj.spNumber" placeholder="电话号码" disabled style="margin-bottom: 10px;"></Input>
+                <Input v-model="againObj.handRemarks" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="备注" style="margin-bottom: 10px;"></Input>
+            </div>
+            <div slot="footer">
+                <Button type="error" size="large" long :loading="modal_loading" @click="again">确定</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -94,12 +105,51 @@
     import util from '@/libs/util'
     import {ERR_OK,pageSize} from '@/config/config'
     export default {
+        computed:{
+          content() {
+            if(this.messageList) {
+              let name;
+                switch (this.againObj.orderStatus) {
+                  case '1' :
+                    name = this.messageList.filter((index)=>{
+                      return index.smsType.indexOf('成功') >= 0
+                    });
+                    return name[0];
+                  case '2' :
+                    name = this.messageList.filter((index)=>{
+                      return index.smsType.indexOf('失败') >= 0
+                    });
+                    return name[0];
+                  case '6' :
+                    return ''
+                }
+            }else {
+              return '';
+            }
+          }
+        },
         data () {
             return {
+              tent:'',//tent-spNu
+              spNu:'',
+              disabledGroup:'成功',
+                againObj:{
+                  productCode:'',
+                  mobileNumber:'',
+                  productName:'',
+                  orderStatus:'',
+                  handRemarks:'',
+                  content:'',
+                  orderNo:'',
+                  spNumber:''
+                },
+                messageList:[],
+                collapseName:'',
                 cancelObj:{
                   orderNo:'',
                   remarks:''
                 },
+                modalAgain:false,
                 modalCancel:false,
                 moreSearch:false,
                 modal1:false,
@@ -122,6 +172,8 @@
                 },
                 objectList:[],
                 totalRecords: 0,
+                pageConfig: [8, 10, 15, 18, 20, 300],
+                TotalRecords:0,
                 dataLoading: false,
                 columns1:[
                     {
@@ -153,7 +205,7 @@
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     textAlign: 'left',
-                                    width: '60'
+                                    width: 60
                                 }
                             },params.row.productName)
                         }
@@ -232,8 +284,83 @@
                         title: '操作',
                         key: 'action',
                         align: 'center',
+                        width: 150,
                         render: (h, params) => {
-                            if(params.row.orderStatus !== 4) {
+                            if(params.row.orderStatus != 4) {//!==
+                              if(params.row.orderStatus == 5) {
+                                return h('div',[
+                                  h('Button', {
+                                    props: {
+                                      type: 'warning',
+                                      size: 'small'
+                                    },
+                                    style :{
+                                      marginRight: '5px'
+                                    },
+                                    on: {
+                                      click:()=>{
+                                        let _that = this;//foundColumns
+                                        _that.objectList  = [];
+                                        for(let i in params.row) {
+                                          for(let b = 0; b< _that.foundColumns.length ; b++ ) {
+                                            if(i === _that.foundColumns[b].key) {
+                                              let obj = {};
+                                              obj.name = params.row[i];
+                                              _that.objectList.push(Object.assign({},_that.foundColumns[b],obj))
+                                            }
+                                          }
+                                        }
+                                        this.modal1 = true
+                                      }
+                                    }
+                                  }, '详情'),///core/orders/abnormalEdit
+                                  h('Button', {
+                                    props: {
+                                      type: 'error',
+                                      size: 'small'
+                                    },
+                                    style: {
+                                      marginRight: '5px'
+                                    },
+                                    on: {
+                                      click: () => {
+                                        let _that = this;
+                                        this.againObj.productCode = params.row.productCode;
+                                        this.againObj.mobileNumber = params.row.mobileNumber;
+                                        this.againObj.productName = params.row.productName;
+                                        this.againObj.orderNo = params.row.orderNo;
+                                        _that.dataLoading = true;
+                                        util.ajax.get(util.baseUrl + '/core/orders/smsList', {
+                                          params: {
+                                            productCode:_that.againObj.productCode
+                                          }
+                                        })
+                                          .then(function(res){
+                                            _that.dataLoading = false
+                                            if(res.status == ERR_OK) {
+                                              let index = res.data.data.list.find((index)=>{
+                                                return index.channelType =='手工渠道'
+                                              });
+                                              res.data.data.list.splice(index,1);
+                                              _that.messageList = res.data.data.list.map((index)=> {
+                                                    let spCodes = index.spCode.split(':');
+                                                    index.spCode = spCodes[1];
+                                                    return index;
+                                              });
+                                               _that.modalAgain = true;
+                                            }else {
+                                              _that.$Message.error(res)
+                                            }
+                                          })
+                                          .catch(function(err){
+                                            console.log(err);
+                                          });
+
+                                      }
+                                    }
+                                  }, '修改')
+                                ]);
+                              }
                               return h('div', [
                                 h('Button', {
                                   props: {
@@ -259,13 +386,15 @@
                                 }, '查看详情'),
                               ]);
                             }else {
-                                return h('div', [
+                                return h('div',[
                                   h('Button', {
                                     props: {
                                       type: 'warning',
                                       size: 'small'
                                     },
-                                    style : {marginRight:5},
+                                    style :{
+                                      marginRight: '5px'
+                                    },
                                     on: {
                                       click:()=>{
                                         let _that = this;//foundColumns
@@ -435,6 +564,35 @@
             }
         },
         methods: {
+            again() {
+              console.log(this.againObj);
+              let _that = this;
+              _that.dataLoading = true;
+              util.ajax.get(util.baseUrl + '/core/orders/editV2',{
+                params:_that.againObj
+              })
+                .then(function(res){
+                  _that.dataLoading = false;
+                  _that.modalAgain = false;
+                  if(res.data.status == 200) {
+                    _that.againObj.handRemarks = '';
+                    _that.$Message.success(res.data.msg);
+                    _that.search(_that.filter.pageNo)
+                  }else {
+                    _that.$Message.error(res.data.msg)
+                  }
+                })
+                .catch(function(err){
+                  console.log(err);
+                });
+            },
+            updateItem(value){
+              this.againObj.orderStatus = value;
+            },
+              changePageSize(pageSize) {
+                this.filter.pageSize = pageSize
+                this.search(1)
+              },
             commoneRender(h, params,name) {
                 return h('Tooltip', {
                     props: {
@@ -479,8 +637,8 @@
             },
             changeTime(time) {
                 if(time.length) {
-                    this.filter.startTime = time[0]
-                    this.filter.endTime = time[1]
+                    this.filter.startTime = time[0] + ' ' +'00:00:00';
+                    this.filter.endTime = time[1]+ ' ' +'23:59:59'
                 }else {
                     this.filter.startTime = ''
                     this.filter.endTime = ''
@@ -496,7 +654,7 @@
                     .then(function(res){
                         if(res.status == ERR_OK) {
                             _that.datas = res.data.data.list
-                            _that.totalRecords = res.data.data.total
+                            _that.TotalRecords = res.data.data.total
                             _that.dataLoading = false
                         }else {
                             _that.$Message.error(res)
@@ -531,9 +689,20 @@
             }
         },
         created() {
-            this.filter.startTime = this.initTime[0]
-            this.filter.endTime = this.initTime[1]
+            this.filter.startTime = this.initTime[0];
+            this.filter.endTime = this.initTime[1];
             this.getProvinceName("省份");
+        },
+        watch : {
+          content : function () {
+            if(this.content) {
+                this.againObj.content = this.content.content;
+                this.againObj.spNumber = this.content.spCode;
+            }else {
+              this.againObj.content = '';
+              this.againObj.spNumber = '';
+            }
+          }
         }
     }
 </script>
@@ -580,6 +749,18 @@
     .messageList .ivu-tooltip-inner{
         white-space:normal
     }
-
+    .messageList .page{
+        background: #fff;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        z-index: 999999;
+    }
+    .messageList .ivu-collapse>.ivu-collapse-item>.ivu-collapse-header {
+        padding-left: 10px;
+    }
+    .modelHistory{
+        background: #BBBBBB;
+    }
 </style>
 <!--messageList-->

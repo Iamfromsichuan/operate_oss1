@@ -2,7 +2,7 @@
     <div class="messageList">
         <Row>
             <Col span="3">
-                <Select filterable v-model="filter.channelCode" placeholder="请选择渠道类别" style="width: 90%">
+                <Select filterable v-model="filter.passagewayCode" placeholder="请选择渠道类别" style="width: 90%">
                     <Option v-for="(index,key) in inWayList" :key="key" :value="index.dictionaryCode">{{index.dictionaryName}}</Option>
                 </Select>
             </Col>
@@ -76,7 +76,7 @@
                 items:[],
                 filter: {
                     productCode: '',
-                    channelCode:'',
+                    passagewayCode:'',
                     productName:'',
                     productType:'',
                     effectWay:'',
@@ -91,9 +91,9 @@
                         key: 'productCode',
                     },
                     {
-                        title: '渠道编码',
+                        title: '通道编码',
                         width:80,
-                        key: 'channelCode'
+                        key: 'passagewayCode'
                     },
                     {
                         title: '产品名称',
@@ -124,7 +124,7 @@
                         key: 'amount'
                     },
                     {
-                        title: '通道编码',
+                        title: '总产品ID',
                         key: 'productId'
                     },
                     {
@@ -226,8 +226,8 @@
                 return strs.substring(0,strs.length-1)
             },
             download() {
-                const strs = this._sarilizeUrl(this.filter)
-                console.log(strs)
+                const strs = this._sarilizeUrl(this.filter);
+                console.log(strs);
                 window.location.href = util.baseUrl + '/core/channel/products/export?token='+Cookies.get('token') +"&"+ strs
             },
 

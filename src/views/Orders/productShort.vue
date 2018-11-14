@@ -137,6 +137,18 @@
                 <Button type="primary" size="large" long :loading="modal_loading" @click="deleteItem">确认</Button>
             </div>
         </Modal>
+        <Modal v-model="modalRefuese" width="320">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span>状态更改</span>
+            </p>
+            <div style="text-align:center">
+                <p>确定将状态由 <span style="font-size: 16px;color: red;">{{rename}}</span>  变为<span style="font-size: 16px;color: red;">{{name}}</span> 吗</p>
+            </div>
+            <div slot="footer">
+                <Button type="primary" size="large" long :loading="modal_loading" @click="updateStatus">确认</Button>
+            </div>
+        </Modal>
     </div>
 
 </template>
@@ -147,8 +159,18 @@
     import {ERR_OK,pageSize} from '@/config/config'
 
     export default {
+        computed : {
+          name() {
+            return this.updateObj.systemSend ==0 ?'关闭':'开启'
+          },
+          rename() {
+            return this.updateObj.systemSend ==0 ?'开启':'关闭'
+          }
+        },
         data() {
             return {
+              modalRefuese:false,
+              switch1:false,
                 producstCode:[],//产品编码集合
                 checkedProducstCode:[],
                 fromWays:[],//渠道类型集合
@@ -164,7 +186,7 @@
                 wscCode:'',
                 loading:"",
                 if_add: true,
-                collapseName: '1',
+                collapseName: '',
                 remark:"",
                 // 详情框
                 initTime: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`,
@@ -204,6 +226,10 @@
                 // 退款列表相关
                 dataLoading: false,
                 TotalRecords: 0,
+                updateObj:{
+                  ids:'',
+                  systemSend:''
+                },
                 columns: [
                     {
                         type: 'selection',
@@ -215,7 +241,7 @@
                         align: 'center',
                         key: 'provinceCode',
                         render: (h, params) => {
-                            let _name = ''
+                            let _name = '';
                             for(let i = 0 ; i < this.provenCodes.length ; i ++) {
                                 if(params.row.provinceCode == this.provenCodes[i].dictionaryCode) {
                                     _name = this.provenCodes[i].dictionaryName
@@ -229,7 +255,7 @@
                     {
                         title: '产品类型',
                         align: 'center',
-                        key: 'productCode',
+                        key: 'productName',
                         render: (h, params) => {
                             /*
                             * 手动将 编码转换成名称 方便营销人员辨识
@@ -266,6 +292,43 @@
                         align: 'center',
                         key: 'spCode'
                     },
+                   {
+                     title: '状态切换',
+                     align: 'center',
+                     key: 'systemSend',
+                     render: (h,params) => {
+                          let _that = this;
+                          return h('div',{},[
+                            h('Span',{},params.row.systemSend==0 ? '关闭' : '开启'),//<Icon type="refresh"></Icon>
+                            h('Button',{
+                              props : {
+                                size:'small'
+                              },
+                              style: {
+                                marginLeft:'5px'
+                              },
+                              on : {
+                                click () {
+                                  _that.updateObj.ids = params.row.id;
+                                  _that.updateObj.systemSend = (params.row.systemSend == 0 )? 1 : 0;
+                                  _that.modalRefuese = true
+                                }
+                              }
+                            },[
+                              h('Icon',{
+                                props : {
+                                  type:'refresh',
+                                  color:'green',
+                                  siz : 40
+                                },
+                                style: {
+                                  marginLeft:'5px'
+                                }
+                              }),
+                            ]),
+                          ])
+                       }
+                     },
                     {
                         title: '备注',
                         align: 'center',
@@ -303,14 +366,37 @@
             }
         },
         methods: {
+          updateStatus() {
+            let _that = this;
+            _that.dataLoading = true;
+            util.ajax.get(util.baseUrl + '/core/product/sms/editSmsStatus', {
+              params: _that.updateObj
+            })
+              .then(function(res){
+                _that.dataLoading = false;
+
+                if(res.status == ERR_OK) {
+                  console.log(res)
+                  _that.$Message.success(res.data.msg);
+                  _that.modalRefuese = false;
+                  _that.search(_that.filter.pageNo)
+                }else {
+                  _that.$Message.error(res)
+                }
+              })
+              .catch(function(err){
+
+              });
+          },
+          change(){},
             filterProductCode(val) {
               this.checkedProducstCode=[];
               for(let i =0 ;i < this.producstCode.length ; i ++ ) {
-                 if( this.producstCode[i].passagewayCode === val) {
+                 if( this.producstCode[i].passagewayCode == val) {
                    this.checkedProducstCode.push(this.producstCode[i])
                  }
               }
-              console.log(this.checkedProducstCode.length)
+              console.log(this.checkedProducstCode)
             },
             showWscCode(value){
                 var _that = this
@@ -351,6 +437,7 @@
                       _that.wscCode =''
                       _that.dataLoading = false
                       if(res.status == ERR_OK) {
+                        console.log(res.data.data.list)
                         _that.datas = res.data.data.list
                         _that.TotalRecords = res.data.data.total
                       }else {

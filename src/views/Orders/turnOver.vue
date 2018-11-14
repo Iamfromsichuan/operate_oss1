@@ -4,29 +4,39 @@
         <Collapse v-model="collapseName" style="margin: 10px 0">
             <Panel name="1">
                 <div style="display:inline-block;float: left;margin-right: 10px" @click.stop>
-                    <Select v-model="filter.provinceName" :clearable="true" placeholder="地市" style="width: 100px;">
-                        <Option value="重庆">重庆</Option>
+                    <Select v-model="filter.provinceName" :clearable="true" placeholder="省份" style="width: 100px;">
+                        <Option value="">全部</Option>
                         <Option value="新疆">新疆</Option>
+                        <Option value="重庆">重庆</Option>
                     </Select>
+
                    <!-- <DatePicker :value="initTime" type="datetimerange" placement="bottom-start" placeholder="导入时间" style="width: 300px" @on-change="changeTime"></DatePicker>-->
                     <!--<DatePicker type="date" :start-date="new Date(1991, 4, 14)" placeholder="Select date" style="width: 200px"></DatePicker>-->
-                    <DatePicker type="datetimerange" format="yyyy-MM-dd" placeholder="Select date and time(Excluding seconds)" style="width: 200px"  :value="initTime" @on-change="changeTime"></DatePicker>
+                    <DatePicker type="datetimerange" format="yyyy-MM-dd" placeholder="请选择查询时间" style="width: 200px"  :value="initTime" @on-change="changeTime"></DatePicker>
                     <Button type="primary" icon="ios-search" @click='search(1)'>查找</Button>
-                    <Button type="primary" icon="ios-cloud-download" @click='downloadFile'>导出</Button>
+                    <Button type="warning" icon="ios-cloud-download" @click='downloadFile'>导出</Button>
+                    <Button type="success" icon="ios-cloud-download" @click='showSend'>派单</Button>
                 </div>
                 <div slot="content">
-                    <Select v-model="filter.productType" placeholder="业务类型" style="width: 100px;">
-                        <Option value="低消" key="1">低消</Option>
-                        <Option value="月包" key="2">月包</Option>
-                        <Option value="内容包" key="3">内容包</Option>
-                        <Option value="畅越" key="4">畅越</Option>
-                        <Option value="其他" key="5">其他</Option>
+                    <Select v-model="filter.cityName" :clearable="true" placeholder="地市" style="width: 100px;">
+                        <Option value="">全部</Option>
+                        <Option v-for="(item,index) in cityList" :key="index" :value="item.val">{{item.name}}</Option>
                     </Select>
-                    <Select v-model="filter.provinceName" :clearable="true" placeholder="地市" style="width: 100px;">
-                        <Option value="重庆">重庆</Option>
-                        <Option value="新疆">新疆</Option>
+                    <Select v-if="isAll" v-model="filter.productType" placeholder="业务类型" style="width: 100px;">
+                        <Option value="" key="1">全部</Option>
+                        <Option value="亲情卡" key="2">亲情卡</Option>
+                        <Option value="不限量" key="3">不限量</Option>
+                        <Option value="宽带" key="4">宽带</Option>
                     </Select>
-                    <Select clearable v-model="filter.orderStatus" filterable placeholder="请选择订单状态" style="width: 100px;margin-right: 10px">
+                    <Select v-model="filter.orderSource" :clearable="true" placeholder="渠道" style="width: 150px;">
+                        <Option value="">全部</Option>
+                        <Option value="沃视窗">沃视窗</Option>
+                        <Option value="营销平台">营销平台</Option>
+                        <Option value="沃助手平台">沃助手平台</Option>
+                        <Option value="宽带公司">宽带公司</Option>
+                    </Select>
+                    <Select v-if="isAll" clearable v-model="filter.orderStatus" filterable placeholder="请选择订单状态" style="width: 150px;margin-right: 10px">
+                        <Option value="" :key="">全部</Option>
                         <Option value="-1" :key="">待处理</Option>
                         <Option value="1" :key="">成功</Option>
                         <Option value="2" :key="">失败</Option>
@@ -37,47 +47,14 @@
                 </div>
             </Panel>
         </Collapse>
-      <!--  <Row :gutter="10" style="margin: 10px 0">
-            <Col span="2">
-                <Input v-model="filter.productName" placeholder="产品名称" clearable ></Input>
-            </Col>
-            <Col span="3">
-                <Input v-model="filter.contactPhone" placeholder="联系电话" clearable ></Input>
-            </Col>
-            <Col span="2">
-                <Input v-model="filter.provinceName" placeholder="省份名称" clearable ></Input>
-            </Col>
-            <Col span="2">
-                <Input v-model="filter.cityName" placeholder="地市名称" clearable ></Input>
-            </Col>
-            <Col span="2">
-                <Input v-model="filter.orderStatus" placeholder="订单状态" clearable ></Input>
-            </Col>
-            <Col span="2">
-                <Input v-model="filter.trackStatus" placeholder="跟单状态" clearable ></Input>
-                &lt;!&ndash;<Select clearable v-model="filter.procStatus" filterable placeholder="请选择处理状态">
-                    <Option value="-1" :key="">未处理</Option>
-                    <Option value="1" :key="">成功</Option>
-                    <Option value="2" :key="">无效</Option>
-                </Select>&ndash;&gt;
-            </Col>
-            <Col span="2">
-                <Input v-model="filter.orderSource" placeholder="订单来源" clearable ></Input>
-            </Col>
-            <Col span="6">
-                <DatePicker :value="initTime" type="datetimerange" placement="bottom-start" placeholder="导入时间" style="width: 100%" @on-change="changeTime"></DatePicker>
-            </Col>
-            <Col span="3">
-                <Button type="primary" icon="ios-search" @click='search(1)'>查找</Button>
-                <Button type="primary" icon="ios-cloud-download" @click='downloadFile'>下载</Button>
-            </Col>
-        </Row>-->
         <Table
+
                 :columns="columns"
                 :data="datas"
                 :loading="dataLoading"
+                ref="selection"
+                @on-selection-change="removeame"
                 size="small"></Table>
-
         <br>
         <br>
         <div class="page">
@@ -86,40 +63,83 @@
                 当前共<span style="color: #f00;font-weight: bold;"> {{TotalRecords}} </span>条记录
             </div>
         </div>
-        <!-- 删除 -->
+
+        <Modal v-model="modalSend" width="320">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span>派单</span>
+            </p>
+            <p>当前选中订单数：<span style="color: red;">{{selection.length}}</span></p>
+            <hr>
+            <div>
+                <p style="margin-bottom: 10px;font-size: 16px;">指定派送人：</p>
+                <!--@on-change="checkedUser"-->
+                <Select v-model="model12" filterable  >
+                    <Option :value="firstUser.dictionaryCode" :key="firstUser.dictionaryCode">{{ firstUser.dictionaryName }}</Option>
+                    <Option v-for="item in userList" :value="item.dictionaryCode" :key="item.dictionaryCode">{{ item.dictionaryName }}</Option>
+                </Select>
+            </div>
+            <div slot="footer">
+                <Button type="primary" size="large" long :loading="modal_loading" @click="sendOrder">确认</Button>
+            </div>
+        </Modal>
+        <!-- 订单回访弹窗 -->
         <Modal v-model="modalEditor" width="320">
             <p slot="header" style="color:#f60;text-align:center">
                 <Icon type="information-circled"></Icon>
                 <span>订单回访</span>
             </p>
-            <RadioGroup v-model="editor.trackStatus">
-                <p>待跟进</p>
-                <Radio label="301">未接</Radio>
-                <Radio label="302">挂断</Radio>
-                <Radio label="303">线路忙</Radio>
-                <Radio label="304">关机</Radio>
-                <Radio label="305">回头联系</Radio>
-                <Radio label="306">次月办理</Radio>
-                <Radio label="307">其他</Radio>
+            <RadioGroup v-model="editor.trackStatus" @on-change="showOtherInput">
+                <p style="font-size: 16px;font-weight: 800;">待跟进</p>
+                <Radio label="301" style="width: 28%;margin-right: 0;box-sizing: border-box">未接</Radio>
+                <Radio label="302" style="width: 28%;margin-right: 0;box-sizing: border-box">挂断</Radio>
+                <Radio label="304" style="width: 28%;margin-right: 0;box-sizing: border-box">关机</Radio>
+                <Radio label="305" style="width: 28%;margin-right: 0;box-sizing: border-box">回头联系</Radio>
+                <Radio label="306" style="width: 28%;margin-right: 0;box-sizing: border-box">次月办理</Radio>
+                <Radio label="308" style="width: 28%;margin-right: 0;box-sizing: border-box">无法接通</Radio>
+                <Radio label="307" style="width: 28%;margin-right: 0;box-sizing: border-box;display: block;">其他</Radio>
+                <Input v-if="otherIdea" placeholder="请输入其他情况" style="width: 90%;margin-top: 10px;"  v-model='editor.obligate'></Input>
                 <hr>
-                <p>关闭</p>
-                <Radio label="1">成功办理</Radio>
-                <Radio label="2">失败</Radio>
-                <Radio label="201">语言不通</Radio>
-                <Radio label="202">点错</Radio>
-                <Radio label="203">无法配送</Radio>
-                <Radio label="204">不办理</Radio>
-                <Radio label="205">非王卡套餐</Radio>
-                <Radio label="206">要换套餐</Radio>
+                <p style="font-size: 16px;font-weight: 800;">关闭</p>
+                <Radio label="1" style="width: 28%;margin-right: 0;box-sizing: border-box">成功办理</Radio>
+                <Radio label="201" style="width: 28%;margin-right: 0;box-sizing: border-box">语言不通</Radio>
+                <Radio label="202" style="width: 28%;margin-right: 0;box-sizing: border-box">点错</Radio>
+                <Radio label="203" style="width: 28%;margin-right: 0;box-sizing: border-box">无法配送</Radio>
+                <Radio label="204" style="width: 28%;margin-right: 0;box-sizing: border-box">不办理</Radio>
+                <Radio label="205" style="width: 28%;margin-right: 0;box-sizing: border-box">非王卡套餐</Radio>
+                <Radio label="206" style="width: 28%;margin-right: 0;box-sizing: border-box">要换套餐</Radio>
+                <Radio label="207" style="width: 28%;margin-right: 0;box-sizing: border-box;display: block;">其他</Radio>
+                <Input v-if="otherIdeaDown" placeholder="请输入其他情况" style="width: 90%;margin-top: 10px;"  v-model='editor.obligate'></Input>
             </RadioGroup>
             <hr>
             <div>
-                <p>备注</p>
+                <p style="font-size: 16px;font-weight: 800;">备注</p>
                 <Input v-model="editor.remarks" type="textarea" :rows="2" placeholder="请填写备注" />
                 <!--v-model="value6"-->
             </div>
             <div slot="footer">
                 <Button type="primary" size="large" long :loading="modal_loading" @click="subOrder">确认</Button>
+            </div>
+        </Modal>
+        <!--订单历史-->
+        <Modal v-model="modalHistory" width="300" class="modelHistory">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span>订单操作历史</span><br/>
+            </p>
+            <div style="margin-bottom: 20px;">
+                <p>跟单业务：<span>{{historyDetaile.productName}}</span></p>
+                <p>用户号码：<span>{{historyDetaile.contactPhone}}</span></p>
+                <p>下单时间：<span>{{historyDetaile.createTime}}</span></p>
+            </div>
+            <Timeline>
+                <TimelineItem v-for="(item,index) in historyList" :key="index">
+                    <p class="time">{{item.logInfo +'(' + item.operator + ')'}}</p>
+                    <p class="content">{{item.createTime}}</p>
+                </TimelineItem>
+            </Timeline>
+            <div slot="footer">
+                <Button type="error" size="large" long :loading="modal_loading" @click="historyClose">确定</Button>
             </div>
         </Modal>
     </div>
@@ -133,11 +153,35 @@
   import QuickFilter from '@/views/main-components/quickFilter'
 
   export default {
+    computed:{
+      dates() {
+         return this.date
+      }
+    },
     data() {
       return {
+        firstUser:{
+          dictionaryCode:'',
+          dictionaryName:''
+        },
+        defaultUser:Cookies.get("user"),
+        userList:[],
+        model12:[],
+        modalSend:false,
+        selection:[],
+        temp:60*60*2*1000,
+        date : new Date(),
+        otherIdea:false,
+        otherIdeaDown:false,
+        historyDetaile:{},
+        historyList:[],
+        modalHistory:false,
+        deliveryOrderNo:'',
+        isAll : true,
         tagIndex:'',
         collapseName:'',
-        tagList: [ '亲情卡','不限量', '宽带', '回访订单'],
+        tagList: [ '订单详情','亲情卡','不限量', '宽带'],
+        cityList:[{name:'乌鲁木齐',val:'乌鲁木齐'},{name:'吐鲁番',val:'吐鲁番'},{name:'阿勒泰',val:'阿勒泰'},{name:'伊犁',val:'伊犁'},{name:'重庆',val:'重庆'},{name:'四川',val:'四川'},{name:'昌吉',val:'昌吉'},],
         modalEditor:false,
         byte:"",
         InputList:[],//表中有多个字段
@@ -152,7 +196,7 @@
           pageNo: 1,
           pageSize: pageSize,
           trackStatus:'',
-          orderStatus:-1,
+          orderStatus:'',
           orderSource:'',
           startTime: '',
           endTime: '',
@@ -160,10 +204,17 @@
           productName:'',
           provinceName:'',
           contactPhone:'',
-          productType:'1'//回访订单
+          obligate:'',
+          token:Cookies.get('token'),
+          productType:''//回访订单
         },
         TotalRecords: 0,
         columns: [
+          {
+            type: 'selection',
+            width: 40,
+            align: 'center'
+          },
           {
             title: '业务',
             align: 'center',
@@ -172,9 +223,14 @@
           {
             title: '用户号码',
             align: 'center',
-            key: 'contactPhone'
+            key: 'contactPhone',
+            width:'100'
           },
-
+          {
+            title: '地市',
+            align: 'center',
+            key: 'cityName'
+          },
           {
             title: '产品名称',
             align: 'center',
@@ -200,23 +256,39 @@
           {
             title: '渠道',
             align: 'center',
-            key: 'orderSource'
+            key: 'orderSource',
+            width:90
+           /* render : (h,params) => {
+              if(params.row.orderSource.indexOf('沃') < 0) {//<Icon type="settings"></Icon>
+                return h('div',{},[
+                  h('span',{},params.row.orderSource),//<Icon type="checkmark"></Icon>
+                  h('Icon',{
+                    props: {
+                      type:'checkmark',
+                      size:12,
+                      color:'red'
+                    },
+                    style : {
+                      marginLeft:"5px"
+                    }
+                  })
+                ])
+              }else {
+                return h('span',{},params.row.orderSource)
+              }
+            }*/
           },
           {
             title: '省份',
             align: 'center',
             key: 'provinceName'
           },
-          {
-            title: '地市',
-            align: 'center',
-            key: 'cityName'
-          },
+
           {
             title: '订单状态',
             align: 'center',
             key: 'orderStatus',
-            render : (h,params) => {
+            render : (h,params) => {//_disabled: true
               let name ;
               for(let i = 0 ; i < this.statusList.length ; i ++) {
                 if(params.row.orderStatus === this.statusList[i].status) {
@@ -234,35 +306,24 @@
             title: '创建时间',
             align: 'center',
             key: 'createTime',
+            width:'90',
             render: (h, params) => {
-              return h('div', {
-                /*on: {
-                  dblclick: () => {
-                    this.modalDetail = true
-                    this.infoDetail = params.row
-                  }
-                }*/
-              }, [
-                h('Tooltip', {
-                  props: {
-                    content: params.row.createTime,
-                    placement: 'top-start'
-                  },
-                  style: {
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    textAlign: 'left'
-                  }
-                }, params.row.createTime.split(" ")[0])
-              ])
+              let _that = this;
+              let ti = params.row.createTime;
+              let timenow = _that.initTimes(ti);
+              return h('div',{
+                style : {
+                  paddingRight : '10px'
+                }
+              },timenow)
             }
           },
           {
             title: '跟单状态',
             align: 'center',
             key: 'trackStatus',
-            className: 'demo-table-info-column',
+            width:60,
+            className: 'demo-table-info-column1',
             render : (h,params) => {
               let name ;
               for(let i = 0 ; i < this.statusList.length ; i ++) {
@@ -276,28 +337,68 @@
                 },
                 on : {
                     click : () => {
-                      console.log(1)
+                      this.deliveryOrderNo = params.row.orderNo;
+                      this.historyDetaile = params.row;
+                      this.getHistory();
                     }
                 }
               },name)
             }
           },
           {
-            title: '修改',
+            title: '跟单时间',
             align: 'center',
+            key: 'updateTime',
+            width:'80',
             render: (h, params) => {
+              let _that = this;
+              let ti = params.row.updateTime;
+              let timenow = _that.initTimes(ti);
+              return h('div',{},timenow)
+            }
+          },
+          {
+            title: '跟单人',
+            align: 'center',
+            key: 'receiver',
+            width:'60',
+          },
+          {
+            title: '跟单',
+            align: 'center',
+            width:'60',
+            render: (h, params) => {
+              let type;
+              let icon;
+              if(params.row.orderStatus != '-1'){
+                type = 'default'
+              } else {
+                if((( this.date - params.row.updateTime ) >= this.temp) || params.row.receiver.indexOf("自动处理")>=0 ) {
+                  type = 'warning'
+                }else if(( this.date - params.row.updateTime ) < this.temp ) {
+                  type = 'primary'
+                }
+              }
+              if(params.row.orderSource.indexOf('沃') < 0) {//<Icon type="paper-airplane"></Icon>
+                    icon = 'paper-airplane'
+              }else {
+                    icon = 'edit'
+              }
               return h('Button', {
                 props: {
-                  icon: 'edit',
+                  icon: icon,//edit
                   size: 'small',
-                  type: (params.row.orderStatus == '-1') ? 'warning' : 'default'
+                  type: type
                 },
                 on: {
                   click: () => {
                     if(params.row.orderStatus === -1) {
-                      this.modalEditor = true;
                       this.editor.orderNo = params.row.orderNo;
-                      this.editor.productCode = params.row.productCode
+                      this.editor.productCode = params.row.productCode;
+                      this.editor.remarks = '';
+                      this.editor.obligate = '';
+                      this.editor.trackStatus = 301;
+                      this.modalEditor = true;
                     }else {
                       this.$Message.error("订单已关闭，不可修改")
                     }
@@ -307,111 +408,11 @@
             }
           },
           {
-            title: '跟单时间',
-            align: 'center',
-            key: 'updateTime',
-            render: (h, params) => {
-              return h('div', {
-                /*on: {
-                  dblclick: () => {
-                    this.modalDetail = true
-                    this.infoDetail = params.row
-                  }
-                }*/
-              }, [
-                h('Tooltip', {
-                  props: {
-                    content: params.row.updateTime,
-                    placement: 'top-start'
-                  },
-                  style: {
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    textAlign: 'left'
-                  }
-                }, params.row.updateTime.split(" ")[0])
-              ])
-            }
-          },
-          {
-            title: '跟单人',
-            align: 'center',
-            key: 'receiver'
-          },
-          {
-            title: '地址',
-            align: 'center',
-            key: 'contactAddress',
-            render: (h, params) => {
-                if(params.row.contactAddress) {
-                  return h('div', {}, [
-                    h('Tooltip', {
-                      props: {
-                        content: params.row.contactAddress,
-                        placement: 'top-start'
-                      },
-                      style: {
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        textAlign: 'center',
-                        width: '60px'
-                      }
-                    }, params.row.contactAddress)
-                  ])
-                }else {
-                    return ''
-                }
-            }
-          },
-          {
             title: '备注',
             align: 'center',
             key: 'remarks',
-            render: (h, params) => {
-              if(params.row.remarks) {
-                return h('div', {}, [
-                  h('Tooltip', {
-                    props: {
-                      content: params.row.remarks,
-                      placement: 'top-start'
-                    },
-                    style: {
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      textAlign: 'center',
-                      width: '60px'
-                    }
-                  }, params.row.remarks)
-                ])
-              }else {
-                return ''
-              }
-            }
+            width:'220',
           },
-          {
-            title: '锁定',
-            key: 'action',
-            align: 'center',
-            className: 'demo-table-info-column',
-            render : (h,params) => {
-              return h('Button', {
-                props: {
-                  icon: 'locked',
-                  size: 'small'
-                },
-                on: {
-                  click: () => {
-                    this.modalRefundMarks = true;
-                    this.editOrderNo = params.row.orderNo;
-                    this.refundRmarks = params.row.returnText ? params.row.returnText : `【${params.row.mobileNumber}】于【${params.row.orderData}】订购【${params.row.orderProduct}】业务。用户表示非本人订购，要求退费。与用户协商结果如下:\r\rXXXXXXX\r\r,用户表示满意。以下是该用户的所有订购截图，（如没有截图请联系4000126559）`
-                  }
-                }
-              })
-            }
-          }
         ],
         datas: [],
         pageConfig: [8, 10, 15, 18, 20, 300],
@@ -461,8 +462,12 @@
             statusDes:'次月办理'
           },
           {
+            status:308,
+            statusDes:'无法接通'
+          },
+          {
             status:307,
-            statusDes:'其他(还能再次回访)'
+            statusDes:'其他'
           },
           {
             status:201,
@@ -488,40 +493,190 @@
             status:206,
             statusDes:'要换套餐'
           },
-          /*{
+          {
+            status:999,
+            statusDes:'订单关闭'
+          },
+          {
               status:207,
-              statusDes:'其他(关闭)'
-          }*/
+              statusDes:'其他'
+          }
         ],
         editor: {//editor.remarks
           orderNo:'',
           orderStatus:'',
-          trackStatus:'',
+          trackStatus:'301',
           remarks:'',
           productCode:'',
-          obligate:''
+          obligate:'',
+          token:Cookies.get('token'),
         },
+        times : setInterval(()=>this.date=(new Date()).getTime(),1000)
       }
     },
     methods: {
-      /*rowClassName (row, index) {
-        if (index === 1) {
-          return 'demo-table-info-row';
+      removeame(s) {
+        this.selection = [];
+        this.selection = s.map((item,index)=>{
+          return item.orderNo
+        });
+        console.log(this.selection)
+      },
+      sendOrder() {
+        if(!this.model12) {
+          this.$Message.error("请选择派送人");
+          return
         }
-        return '';
+        let _that = this;
+        let a = this.selection.join(',');
+        util.ajax.get(util.baseUrl + '/core/orders/delivery/dispatch', {
+          params: {
+            orderNos:_that.selection.join(','),
+            dictionaryCodes:_that.model12
+          }
+        })
+          .then(function(res){
+            console.log(res);
+            if(res.status == ERR_OK) {
+              _that.$Message.success(res.data.msg);
+               _that.modalSend = false
+            }
+          })
+          .catch(function(err){
+            console.log(err)
+          });
+      },
+      getUserList() {
+        let _that = this;
+        util.ajax.get(util.baseUrl + '/system/data/dictionary/list', {
+          params: {
+            dictionaryType:'登录名'
+          }
+        })
+          .then(function(res){
+            console.log(res.data);
+            if(res.status == ERR_OK) {
+                _that.userList = res.data;
+                let first = Cookies.get('user');
+                let _index ;
+                _index = _that.userList.findIndex((item)=> {
+                    return item.dictionaryName == first
+               });
+              _that.firstUser = _that.userList.splice(_index,1)[0];
+              console.log(_that.firstUser);
+              console.log(_that.userList)
+            }
+          })
+          .catch(function(err){
+            console.log(err)
+          });
+      },
+      /*checkedUser(val) {
+        console.log(val)
       },*/
+      showSend() {
+        if(this.selection.length > 0 ) {
+          this.model12 = '';
+          this.modalSend = true
+        }else {
+            this.$Message.error("请先选择需要派送的订单")
+        }
+      },
+      name(s,r) {
+        this.selection = [];
+        this.selection = s.map((item,index)=>{
+          return item.orderNo
+        }) ;
+        console.log(this.selection)
+      },
+      initTimes(val) {
+        let time = new Date(val);
+        let compar = function (va) {
+          if(va >= 10) {
+                return va
+          }else if(va < 10) {
+                return 0 + '' + va
+          }
+        };
+        var noeTime = compar(time.getMonth()+1) + '-' + compar(time.getDate()) + ' ' + compar(time.getHours()) +':'+ compar(time.getMinutes());
+        return noeTime;
+      },
+      showOtherInput(val) {
+        if(val == 307) {
+          this.otherIdea = true;
+          this.otherIdeaDown = false;
+          return
+        }else if(val == 207) {
+           this.otherIdeaDown = true;
+          this.otherIdea = false;
+            return
+        }
+        this.otherIdea = false;
+        this.otherIdeaDown = false;
+      },
+      historyClose() {
+        this.modalHistory = false;
+      },
+      getHistory() {
+        let _that = this;
+        util.ajax.get(util.baseUrl + '/core/orders/delivery/logList', {
+          params: {
+            deliveryOrderNo:this.deliveryOrderNo,
+            token:_that.filter.token
+          }
+        })
+          .then(function(res){
+            _that.dataLoading = false;
+            if(res.data.status == ERR_OK) {
+               _that.historyList = res.data.data.list.reverse();
+               for(let i = 0; i < _that.statusList.length ; i ++) {
+                    for(let j = 0 ; j < _that.historyList.length ; j++) {
+                      if(_that.historyList[j].logInfo == _that.statusList[i].status) {
+                        _that.historyList[j].logInfo = _that.statusList[i].statusDes
+                      }
+                    }
+               }
+               _that.modalHistory = true
+            }else {
+
+            }
+          })
+          .catch(function(err){
+            console.log(err)
+          });
+      },
       gettagIndex(index) {
         this.tagIndex = index;
         this.filter.productType = '亲情卡';
+        this.filter.orderStatus = -1;
+        this.initTime = [`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} 00:00:00`, `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} 23:59:59`]
         if(index === -1 || index === 0) {
-            this.filter.productType = '亲情卡';
+          this.filter.productType = '';
+          this.filter.orderStatus = '';
+          this.initTime = [`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} 00:00:00`, `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} 23:59:59`]
+          this.cityList = [{name:'乌鲁木齐',val:'乌鲁木齐'},{name:'吐鲁番',val:'吐鲁番'},{name:'阿勒泰',val:'阿勒泰'},{name:'伊犁',val:'伊犁'},{name:'重庆',val:'重庆'},{name:'四川',val:'四川'},{name:'昌吉',val:'昌吉'},];
+          this.isAll = true
         }else if(index === 1){
-          this.filter.productType = '不限量';
+          this.initTime = ['',''];
+          this.filter.orderStatus = -1;
+          this.filter.productType = '亲情卡';
+          this.cityList = [{name:'乌鲁木齐',val:'乌鲁木齐'},{name:'吐鲁番',val:'吐鲁番'},{name:'阿勒泰',val:'阿勒泰'},{name:'重庆',val:'重庆'}];
+          this.isAll = false
         }else if(index === 2) {
-          this.filter.productType = '宽带';
+          this.initTime = ['',''];
+          this.filter.orderStatus = -1;
+          this.filter.productType = '不限量';
+          this.cityList = [{name:'昌吉',val:'昌吉'}];
+          this.isAll = false
         }else if(index === 3) {
-          this.filter.productType = '回访';
+          this.initTime = ['',''];
+          this.filter.orderStatus = -1;
+          this.filter.productType = '宽带';
+          this.cityList = [{name:'乌鲁木齐',val:'乌鲁木齐'},{name:'四川',val:'四川'}];
+          this.isAll = false
         }
+        this.filter.startTime = this.initTime[0];
+        this.filter.endTime = this.initTime[1];
         this.search(1)
       },
       subOrder() {
@@ -530,7 +685,7 @@
         if(this.editor.trackStatus) {
           this.dataLoading = true;
           let isTrue = false;
-          let arr = [-1,301,302,303,304,305,306,307];
+          let arr = [-1,301,302,303,304,305,306,307,308];
           for (let i = 0 ; i < arr.length ; i++) {//为false 是待处理   为true  就是关闭
             if(arr[i] == this.editor.trackStatus) {
               isTrue = true;
@@ -538,12 +693,27 @@
           }
           if(isTrue) {
             this.editor.orderStatus = -1//待处理订单
+            if(this.editor.trackStatus == 307) {
+                if(!this.editor.obligate) {
+                  this.dataLoading = false;
+                  this.$Message.error("请填写--其他--的详细跟单状态，必填");
+                  return
+                }
+            }
           }else {
             if(this.editor.trackStatus == 2) {
               this.editor.orderStatus = 2//失败
             }else if(this.editor.trackStatus == 1) {
               this.editor.orderStatus = 1//成功
             }else {
+              if(this.editor.trackStatus == 207) {
+                console.log(this.editor.obligate)
+                if(!this.editor.obligate) {
+                  this.dataLoading = false;
+                  this.$Message.error("请填写--其他(失败)--的详细跟单情况，必填");
+                  return
+                }
+              }
               this.editor.orderStatus = 2//失败
             }
           };
@@ -574,15 +744,13 @@
           this.filter.startTime = ''
           this.filter.endTime = ''
         }
-        console.log(this.filter.startTime)
-        console.log(this.filter.endTime)
       },
       search(no) {
         var _that = this;
-        this.filter.pageNo = no
-        this.dataLoading = true
-        this.orderNos = ''
-        this.checkedDatas = []
+        this.filter.pageNo = no;
+        this.dataLoading = true;
+        this.orderNos = '';
+        this.checkedDatas = [];
         util.ajax.get(util.baseUrl + '/core/orders/delivery/list', {
           params: this.filter
         })
@@ -590,7 +758,16 @@
             _that.wscCode =''
             _that.dataLoading = false
             if(res.data.status == ERR_OK) {
-              _that.datas = res.data.data.list
+              let dataList = res.data.data.list;
+              _that.datas = dataList.map((item) => {
+                if(item.orderStatus != -1) {
+                  return Object.assign({},item,{
+                    _disabled: true
+                  })
+                }
+                return item
+              });
+              /*_that.datas = res.data.data.list;*/
               _that.TotalRecords = res.data.data.total
             }else {
               _that.$Message.error(res.data.msg)
@@ -623,7 +800,11 @@
     created() {
       this.filter.startTime = this.initTime[0];
       this.filter.endTime = this.initTime[1];
-      this.search(1)
+      this.getUserList();
+      this.search(1);
+    },
+    destroyed() {
+      clearInterval(this.times);
     }
   }
 </script>
@@ -643,12 +824,25 @@
     }
     .ivu-table thead .demo-table-info-column {
         border-left: none;
+        border-right: none;
     }
     .ivu-table .demo-table-info-column{
-       border-left: 1px solid blue;
+       border-right: 1px solid blue;
+    }
+    .ivu-table .demo-table-info-column1{
+        border-left: 1px solid blue;
     }
     .ivu-table .demo-table-info-row {
         border-left: none!important;
+    }
+   .ivu-modal-header{
+        border-bottom: none!important;
+    }
+    .modelHistory{
+        background: #BBBBBB;
+    }
+    .ivu-table .demo-row td{
+        background-color: red;
     }
 </style>
 
