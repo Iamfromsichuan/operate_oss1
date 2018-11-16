@@ -128,7 +128,7 @@
                 inWayList:[],
                 loading:"",
                 if_add: true,
-                collapseName: '1',
+                collapseName: '',
                 remark:"",
                 // 详情框
                 initTime: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`,

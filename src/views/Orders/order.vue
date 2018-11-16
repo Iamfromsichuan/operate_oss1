@@ -141,7 +141,8 @@
                   handRemarks:'',
                   content:'',
                   orderNo:'',
-                  spNumber:''
+                  spNumber:'',
+                  provinceCode:''
                 },
                 messageList:[],
                 collapseName:'',
@@ -228,7 +229,7 @@
                         render:(h,params) => {
                             return h('Span',
                               {},
-                              params.row.orderStatus === 0 ? '充值中' : params.row.orderStatus === 1 ? '成功' : params.row.orderStatus === 2 ? '失败' : params.row.orderStatus === 3 ? '待查单' : params.row.orderStatus === 4 ? '订单异常' : ''
+                              params.row.orderStatus === 0 ? '充值中' : params.row.orderStatus === 1 ? '成功' : params.row.orderStatus === 2 ? '失败' : params.row.orderStatus === 3 ? '待查单' : params.row.orderStatus === 4 ? '订单异常' :params.row.orderStatus === 5 ? '手工补充':''
                             )
                         }
                     },
@@ -329,19 +330,23 @@
                                         this.againObj.mobileNumber = params.row.mobileNumber;
                                         this.againObj.productName = params.row.productName;
                                         this.againObj.orderNo = params.row.orderNo;
+                                        this.againObj.provinceCode = params.row.provinceCode;
                                         _that.dataLoading = true;
                                         util.ajax.get(util.baseUrl + '/core/orders/smsList', {
                                           params: {
-                                            productCode:_that.againObj.productCode
+                                            productCode:_that.againObj.productCode,
+                                            provinceCode:_that.againObj.provinceCode,
+                                            channelType:'手工补充'
                                           }
                                         })
                                           .then(function(res){
-                                            _that.dataLoading = false
+                                            _that.dataLoading = false;
                                             if(res.status == ERR_OK) {
-                                              let index = res.data.data.list.find((index)=>{
+                                              console.log(res)
+                                              /*let index = res.data.data.list.find((index)=>{
                                                 return index.channelType =='手工渠道'
                                               });
-                                              res.data.data.list.splice(index,1);
+                                              res.data.data.list.splice(index,1);*/
                                               _that.messageList = res.data.data.list.map((index)=> {
                                                     let spCodes = index.spCode.split(':');
                                                     index.spCode = spCodes[1];

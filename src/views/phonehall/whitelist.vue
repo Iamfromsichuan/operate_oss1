@@ -207,7 +207,7 @@
                 ],
                 loading:"",
                 if_add: true,
-                collapseName: '1',
+                collapseName: '',
                 remark:"",
                 // 详情框
                 initTime: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`,
@@ -287,8 +287,8 @@
                     {
                         title: 'Action',
                         key: 'action',
-                        width: 150,
                         align: 'center',
+                        width: 150,
                         render: (h, params) => {
                             return h('div', [
                                 h('Button', {

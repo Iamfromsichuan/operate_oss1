@@ -11,7 +11,7 @@
         data5: [
           {
             title: 'parent 1',
-            expand: true,
+            expand: false,
             render: (h, { root, node, data }) => {
               return h('Row', {
                 style: {
@@ -23,7 +23,7 @@
                   props: {
                     span: '4'
                   }
-                }, [h('span', '我的名字')]),
+                }, [h('span', '类型')]),
                 h('Col', {
                   props: {
                     span: '4'
@@ -37,7 +37,7 @@
                       marginRight: '10px'
                     }
                   }),
-                  h("span", '不要1111')
+                  h("span", '名称')
                 ]),
                 h('Col', {
                   props: {
@@ -53,7 +53,7 @@
                       marginLeft: '10px'
                     }
                   }),
-                  h("span", '问')
+                  h("span", '编码')
                 ]),
                 h('Button', {
                   props: Object.assign({}, this.buttonProps, {
@@ -82,7 +82,7 @@
     },
     methods: {
       getTrees () {
-        var _that = this
+        var _that = this;
         this.$Spin.show();
         util.ajax.get(util.baseUrl + '/system/data/dictionary/list')
           .then(function(res){
@@ -98,7 +98,7 @@
                 if(common.indexOf(item.dictionaryType)  < 0 ) {
                   let obj = Object.assign({},item,{
                     children:[],
-                    expand: true,
+                    expand: false,
                     description: "",
                     dictionaryCode: name,
                     dictionaryName: name,
@@ -115,13 +115,13 @@
                   if(arr[i].dictionaryType === item.dictionaryType) {
                     let obj = Object.assign({},item,{
                       children:[],
-                      expand: true
+                      expand: false
                     });
                     arr[i].children.push(item);
                     obj = null;
                   }
                 }
-              })
+              });
               console.log(arr)
             }else {
               _that.$Message.error(res.toString())
@@ -140,7 +140,7 @@
           if(common.indexOf(item.dictionaryType)  < 0 ) {
             let obj = Object.assign({},item,{
               children:[],
-              expand: true,
+              expand: false,
               description: "",
               dictionaryCode: name,
               dictionaryName: name,
@@ -228,7 +228,7 @@
         const children = data.children || [];
         children.push({
           title: 'appended node',
-          expand: true
+          expand: false
         });
         this.$set(data, 'children', children);
       },

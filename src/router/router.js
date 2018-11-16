@@ -79,7 +79,7 @@ export const appRouter = [
             { path: 'presented', title: '送费', icon: 'android-send', name: 'presented_index', /* access: 0, */ component: resolve => { require(['@/views/xjcu/presented.vue'], resolve); } }
         ]
     },
-    {
+/*    {
         path: '/gzcu',
         icon: 'ios-analytics',
         title: '贵州联通',
@@ -87,12 +87,12 @@ export const appRouter = [
         // access: 0,
         component: Main,
         children: [
-            { path: 'sendMessage', title: '发送短信', icon: 'android-open', name: 'sendMessage_index', /* access: 0, */ component: resolve => { require(['@/views/gzcu/sendMessage.vue'], resolve); } },
-            // { path: 'messageUp', title: '短信上行', icon: 'paper-airplane', name: 'messageUp_index', /*access: 0,*/ component: resolve => { require(['@/views/gzcu/messageUp.vue'], resolve); } },
-            { path: 'sendCsvMessage', title: '批发短信', icon: 'email', name: 'sendCsvMessage_index', /* access: 0, */ component: resolve => { require(['@/views/gzcu/sendCsvMessage.vue'], resolve); } }
+            { path: 'sendMessage', title: '发送短信', icon: 'android-open', name: 'sendMessage_index', /!* access: 0, *!/ component: resolve => { require(['@/views/gzcu/sendMessage.vue'], resolve); } },
+            // { path: 'messageUp', title: '短信上行', icon: 'paper-airplane', name: 'messageUp_index', /!*access: 0,*!/ component: resolve => { require(['@/views/gzcu/messageUp.vue'], resolve); } },
+            { path: 'sendCsvMessage', title: '批发短信', icon: 'email', name: 'sendCsvMessage_index', /!* access: 0, *!/ component: resolve => { require(['@/views/gzcu/sendCsvMessage.vue'], resolve); } }
         ]
-    },
-    {
+    },*/
+/*    {
         path: '/hncu',
         icon: 'ios-analytics',
         title: '海南联通',
@@ -100,13 +100,13 @@ export const appRouter = [
         // access: 0,
         component: Main,
         children: [
-            { path: 'sendMessageHN', title: '发送短信', icon: 'android-open', name: 'sendMessageHN_index', /* access: 0, */ component: resolve => { require(['@/views/hncu/sendMessageHN.vue'], resolve); } },
-            // { path: 'messageUpHN', title: '短信上行', icon: 'paper-airplane', name: 'messageUpHN_index', /*access: 0,*/ component: resolve => { require(['@/views/hncu/messageUpHN.vue'], resolve); } },
-            { path: 'sendCsvMessageHN', title: '批发短信', icon: 'email', name: 'sendCsvMessageHN_index', /* access: 0, */ component: resolve => { require(['@/views/hncu/sendCsvMessageHN.vue'], resolve); } },
-            { path: 'productInformationHN', title: '产品信息', icon: 'email', name: 'productInformationHN_index', /* access: 0, */ component: resolve => { require(['@/views/hncu/productInformation.vue'], resolve); } }
+            { path: 'sendMessageHN', title: '发送短信', icon: 'android-open', name: 'sendMessageHN_index', /!* access: 0, *!/ component: resolve => { require(['@/views/hncu/sendMessageHN.vue'], resolve); } },
+            // { path: 'messageUpHN', title: '短信上行', icon: 'paper-airplane', name: 'messageUpHN_index', /!*access: 0,*!/ component: resolve => { require(['@/views/hncu/messageUpHN.vue'], resolve); } },
+            { path: 'sendCsvMessageHN', title: '批发短信', icon: 'email', name: 'sendCsvMessageHN_index', /!* access: 0, *!/ component: resolve => { require(['@/views/hncu/sendCsvMessageHN.vue'], resolve); } },
+            { path: 'productInformationHN', title: '产品信息', icon: 'email', name: 'productInformationHN_index', /!* access: 0, *!/ component: resolve => { require(['@/views/hncu/productInformation.vue'], resolve); } }
         ]
-    },
-    {
+    },*/
+/*    {
         path: '/cqcu',
         icon: 'ios-analytics',
         title: '重庆联通',
@@ -114,12 +114,12 @@ export const appRouter = [
         // access: 0,
         component: Main,
         children: [
-            { path: 'sendMessageCQ', title: '发送短信', icon: 'android-open', name: 'sendMessageCQ_index', /* access: 0, */ component: resolve => { require(['@/views/cqcu/sendMessageCQ.vue'], resolve); } },
-            // { path: 'messageUpCQ', title: '短信上行', icon: 'paper-airplane', name: 'messageUpSC_index', /*access: 0,*/ component: resolve => { require(['@/views/cqcu/messageUpCQ.vue'], resolve); } },
-            { path: 'sendCsvMessageCQ', title: '批发短信', icon: 'email', name: 'sendCsvMessageCQ_index', /* access: 0, */ component: resolve => { require(['@/views/cqcu/sendCsvMessageCQ.vue'], resolve); } }
+            { path: 'sendMessageCQ', title: '发送短信', icon: 'android-open', name: 'sendMessageCQ_index', /!* access: 0, *!/ component: resolve => { require(['@/views/cqcu/sendMessageCQ.vue'], resolve); } },
+            // { path: 'messageUpCQ', title: '短信上行', icon: 'paper-airplane', name: 'messageUpSC_index', /!*access: 0,*!/ component: resolve => { require(['@/views/cqcu/messageUpCQ.vue'], resolve); } },
+            { path: 'sendCsvMessageCQ', title: '批发短信', icon: 'email', name: 'sendCsvMessageCQ_index', /!* access: 0, *!/ component: resolve => { require(['@/views/cqcu/sendCsvMessageCQ.vue'], resolve); } }
         ]
-    },
-    {
+    },*/
+/*    {
         path: '/sccu',
         icon: 'ios-analytics',
         title: '四川联通',
@@ -127,11 +127,11 @@ export const appRouter = [
         // access: 0,
         component: Main,
         children: [
-            { path: 'sendMessageSC', title: '发送短信', icon: 'android-open', name: 'sendMessageSC_index', /* access: 0, */ component: resolve => { require(['@/views/sccu/sendMessageSC.vue'], resolve); } },
-            // { path: 'messageUpSC', title: '短信上行', icon: 'paper-airplane', name: 'messageUpSC_index', /*access: 0,*/ component: resolve => { require(['@/views/sccu/messageUpSC.vue'], resolve); } },
-            { path: 'sendCsvMessageSC', title: '批发短信', icon: 'email', name: 'sendCsvMessageSC_index', /* access: 0, */ component: resolve => { require(['@/views/sccu/sendCsvMessageSC.vue'], resolve); } }
+            { path: 'sendMessageSC', title: '发送短信', icon: 'android-open', name: 'sendMessageSC_index', /!* access: 0, *!/ component: resolve => { require(['@/views/sccu/sendMessageSC.vue'], resolve); } },
+            // { path: 'messageUpSC', title: '短信上行', icon: 'paper-airplane', name: 'messageUpSC_index', /!*access: 0,*!/ component: resolve => { require(['@/views/sccu/messageUpSC.vue'], resolve); } },
+            { path: 'sendCsvMessageSC', title: '批发短信', icon: 'email', name: 'sendCsvMessageSC_index', /!* access: 0, *!/ component: resolve => { require(['@/views/sccu/sendCsvMessageSC.vue'], resolve); } }
         ]
-    },
+    },*/
     {
         path: '/system',
         icon: 'gear-a',
@@ -143,7 +143,6 @@ export const appRouter = [
             { path: 'menu', title: '系统功能', icon: 'ios-cog', name: 'menu_index', access: 0, component: resolve => { require(['@/views/system/menu.vue'], resolve); } },
             { path: 'role', title: '角色管理', icon: 'person-stalker', name: 'role_index', access: 0, component: resolve => { require(['@/views/system/role.vue'], resolve); } },
             { path: 'user', title: '用户管理', icon: 'person-add', name: 'user_index', access: 1, component: resolve => { require(['@/views/system/user.vue'], resolve); } },
-            { path: 'globalAttributes', title: '全局参数', icon: 'person-add', name: 'global_index', access: 0, component: resolve => { require(['@/views/system/globalAttributes.vue'], resolve); } },
             { path: 'globalAttributes1', title: '全局参数', icon: 'person-add', name: 'global_index1', access: 0, component: resolve => { require(['@/views/system/globalAttributes1.vue'], resolve); } }
         ]
     },
@@ -207,6 +206,7 @@ export const appRouter = [
             { path: 'blackList', title: '底层黑名单', icon: 'email', name: 'blackList', /* access: 0, */ component: resolve => { require(['@/views/shortMessageModule/blackList.vue'], resolve); }},
             { path: 'shortMessageUp', title: '短信上行', icon: 'email', name: 'shortMessageUp', /* access: 0, */ component: resolve => { require(['@/views/shortMessageModule/shortMessageUp.vue'], resolve); }},
             { path: 'shortMessageList', title: '短信列表', icon: 'email', name: 'shortMessageList', /* access: 0, */ component: resolve => { require(['@/views/shortMessageModule/shortMessageList.vue'], resolve); }},
+            { path: 'sendMessage', title: '短信群发', icon: 'email', name: 'sendMessage', /* access: 0, */ component: resolve => { require(['@/views/shortMessageModule/sendMessage.vue'], resolve); }},
         ]
     },
     {

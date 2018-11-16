@@ -16,7 +16,7 @@
     },
     data() {
       return {
-        checkedIndex: 3
+        checkedIndex: 0
       }
     },
     methods: {

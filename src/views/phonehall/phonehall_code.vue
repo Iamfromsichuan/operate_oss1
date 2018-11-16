@@ -130,7 +130,7 @@
                 loading:"",
                 value14: 'Hello World',
                 if_add: true,
-                collapseName: '1',
+                collapseName: '',
                 // 详情框
                 initTime: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`,
                 ruleValidate: {
